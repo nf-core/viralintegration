@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "outdir", "viral_fasta"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -21,6 +21,12 @@
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/viralintegration/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "viral_fasta": {
+                    "type": "string",
+                    "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.fasta",
+                    "description": "Path to fasta file with viral genomes",
+                    "help_text": ""
                 },
                 "outdir": {
                     "type": "string",

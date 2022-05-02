@@ -47,6 +47,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
+include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -78,6 +79,13 @@ workflow VIRALINTEGRATION {
         INPUT_CHECK.out.reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+    ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
+                file(params.viral_fasta, checkIfExists: true) ]
+
+    SAMTOOLS_FAIDX (
+        ch_viral_fasta
+    )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

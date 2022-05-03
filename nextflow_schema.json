@@ -25,8 +25,7 @@
                 "viral_fasta": {
                     "type": "string",
                     "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.fasta",
-                    "description": "Path to fasta file with viral genomes",
-                    "help_text": ""
+                    "description": "Path to fasta file with viral genomes"
                 },
                 "outdir": {
                     "type": "string",
@@ -68,6 +67,15 @@
                     "description": "Path to FASTA genome file.",
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
+                },
+                "gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to GTF annotation file.",
+                    "fa_icon": "fas fa-code-branch",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified."
                 },
                 "igenomes_base": {
                     "type": "string",

@@ -1,3 +1,3 @@
 sample,fastq_1,fastq_2
-test,https://raw.githubusercontent.com/broadinstitute/CTAT-VirusIntegrationFinder/master/testing/reads_1.fastq.gz,https://raw.githubusercontent.com/broadinstitute/CTAT-VirusIntegrationFinder/master/testing/reads_2.fastq.gz
-novirusreads,https://raw.githubusercontent.com/broadinstitute/CTAT-VirusIntegrationFinder/master/testing/test.novirus.reads_1.fastq.gz,https://raw.githubusercontent.com/broadinstitute/CTAT-VirusIntegrationFinder/master/testing/test.novirus.reads_2.fastq.gz
+test,https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/reads_1.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/reads_2.fastq.gz
+novirusreads,https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/novirus_reads_1.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/novirus_reads_2.fastq.gz

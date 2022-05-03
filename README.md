@@ -1,4 +1,4 @@
-# ![nf-core/viralintegration](docs/images/nf-core/viralintegration_logo_light.png#gh-light-mode-only) ![nf-core/viralintegration](docs/images/nf-core/viralintegration_logo_dark.png#gh-dark-mode-only)
+# ![nf-core/viralintegration](docs/images/nf-core-viralintegration_logo_light.png#gh-light-mode-only) ![nf-core/viralintegration](docs/images/nf-core-viralintegration_logo_dark.png#gh-dark-mode-only)
 
 [![GitHub Actions CI Status](https://github.com/nf-core/viralintegration/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/viralintegration/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/nf-core/viralintegration/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/viralintegration/actions?query=workflow%3A%22nf-core+linting%22)

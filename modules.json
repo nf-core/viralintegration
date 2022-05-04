@@ -9,6 +9,9 @@
             "fastqc": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
+            "metaphlan3": {
+                "git_sha": "ed4dd1a928ebf4308efb720de878045f7773f8e2"
+            },
             "multiqc": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },

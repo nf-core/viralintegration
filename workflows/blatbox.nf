@@ -48,6 +48,8 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { BWA_MEM                     } from '../modules/nf-core/modules/bwa/mem/main'
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
+include { SAMTOOLS_VIEW as SAMTOOLS_VIEW_UNMAPPED } from '../modules/nf-core/modules/samtools/view/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -80,12 +82,35 @@ workflow BLATBOX {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
+    ch_bwa_index = file(params.bwa_index)
     BWA_MEM (
         INPUT_CHECK.out.reads,
-        params.bwa_index,
+        ch_bwa_index,
         true
     )
     ch_versions = ch_versions.mix(BWA_MEM.out.versions.first())
+
+    SAMTOOLS_INDEX ( BWA_MEM.out.bam )
+    ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
+
+    BWA_MEM.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(SAMTOOLS_INDEX.out.csi, by: [0], remainder: true)
+        .map {
+            meta, bam, bai, csi ->
+                if (bai) {
+                    [ meta, bam, bai ]
+                } else {
+                    [ meta, bam, csi ]
+                }
+        }
+        .set { ch_bam_bai }
+
+    SAMTOOLS_VIEW_UNMAPPED (
+        ch_bam_bai,
+        []
+    )
+    ch_versions = ch_versions.mix(SAMTOOLS_VIEW_UNMAPPED.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

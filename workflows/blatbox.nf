@@ -98,7 +98,7 @@ workflow BLATBOX {
     ch_versions = ch_versions.mix(SAMTOOLS_FASTA.out.versions.first())
 
     BLAST_MAKEBLASTDB (
-       params.fasta
+       params.viral_fasta
     )
 
     BLAST_BLASTN (

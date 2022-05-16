@@ -50,6 +50,7 @@ include { FASTQC                      } from '../modules/nf-core/modules/fastqc/
 include { BWA_MEM                     } from '../modules/nf-core/modules/bwa/mem/main'
 include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { SAMTOOLS_VIEW as SAMTOOLS_VIEW_UNMAPPED } from '../modules/nf-core/modules/samtools/view/main'
+include { BLAST_MAKEBLASTDB           } from '../modules/nf-core/modules/blast/makeblastdb/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -111,6 +112,10 @@ workflow BLATBOX {
         []
     )
     ch_versions = ch_versions.mix(SAMTOOLS_VIEW_UNMAPPED.out.versions.first())
+
+    BLAST_MAKEBLASTDB (
+       params.fasta
+    )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

@@ -20,12 +20,6 @@
             },
             "samtools/faidx": {
                 "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
-            },
-            "samtools/index": {
-                "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
-            },
-            "samtools/view": {
-                "git_sha": "6b64f9cb6c3dd3577931cc3cd032d6fb730000ce"
             }
         }
     }

@@ -32,6 +32,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { SAMTOOLS_FASTA } from '../modules/local/samtools/fasta/main'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -48,8 +50,6 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { BWA_MEM                     } from '../modules/nf-core/modules/bwa/mem/main'
-include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
-include { SAMTOOLS_VIEW as SAMTOOLS_VIEW_UNMAPPED } from '../modules/nf-core/modules/samtools/view/main'
 include { BLAST_MAKEBLASTDB           } from '../modules/nf-core/modules/blast/makeblastdb/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
@@ -91,27 +91,10 @@ workflow BLATBOX {
     )
     ch_versions = ch_versions.mix(BWA_MEM.out.versions.first())
 
-    SAMTOOLS_INDEX ( BWA_MEM.out.bam )
-    ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
-
-    BWA_MEM.out.bam
-        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(SAMTOOLS_INDEX.out.csi, by: [0], remainder: true)
-        .map {
-            meta, bam, bai, csi ->
-                if (bai) {
-                    [ meta, bam, bai ]
-                } else {
-                    [ meta, bam, csi ]
-                }
-        }
-        .set { ch_bam_bai }
-
-    SAMTOOLS_VIEW_UNMAPPED (
-        ch_bam_bai,
-        []
+    SAMTOOLS_FASTA (
+        BWA_MEM.out.bam
     )
-    ch_versions = ch_versions.mix(SAMTOOLS_VIEW_UNMAPPED.out.versions.first())
+    ch_versions = ch_versions.mix(SAMTOOLS_FASTA.out.versions.first())
 
     BLAST_MAKEBLASTDB (
        params.fasta

@@ -51,6 +51,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { BWA_MEM                     } from '../modules/nf-core/modules/bwa/mem/main'
 include { BLAST_MAKEBLASTDB           } from '../modules/nf-core/modules/blast/makeblastdb/main'
+include { BLAST_BLASTN                } from '../modules/nf-core/modules/blast/blastn/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -98,6 +99,11 @@ workflow BLATBOX {
 
     BLAST_MAKEBLASTDB (
        params.fasta
+    )
+
+    BLAST_BLASTN (
+        SAMTOOLS_FASTA.out.fasta,
+        BLAST_MAKEBLASTDB.out.db
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

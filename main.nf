@@ -35,12 +35,20 @@ WorkflowMain.initialise(workflow, params, log)
 */
 
 include { VIRALINTEGRATION } from './workflows/viralintegration'
+include { BLATBOX } from './workflows/blatbox'
 
 //
 // WORKFLOW: Run main nf-core/viralintegration analysis pipeline
 //
 workflow NFCORE_VIRALINTEGRATION {
     VIRALINTEGRATION ()
+}
+
+//
+// WORKFLOW: Run main nf-core/viralintegration analysis pipeline
+//
+workflow NFCORE_BLATBOX {
+    BLATBOX ()
 }
 
 /*

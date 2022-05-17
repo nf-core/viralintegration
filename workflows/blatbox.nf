@@ -68,32 +68,23 @@ workflow BLATBOX {
 
     ch_versions = Channel.empty()
 
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-    INPUT_CHECK (
-        ch_input
-    )
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    //
-    // MODULE: Run FastQC
-    //
-    FASTQC (
-        INPUT_CHECK.out.reads
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
-
-    ch_bwa_index = file(params.bwa_index)
-    BWA_MEM (
-        INPUT_CHECK.out.reads,
-        ch_bwa_index,
-        true
-    )
-    ch_versions = ch_versions.mix(BWA_MEM.out.versions.first())
+    ch_bam = Channel.fromFilePairs(params.input, size: -1)
+        .map {
+            meta, bam ->
+            def fmeta = [:]
+            // Set meta.id
+            fmeta.id = meta
+            // Set meta.single_end
+            if (bam.size() == 1) {
+                fmeta.single_end = true
+            } else {
+                fmeta.single_end = false
+            }
+            [ fmeta, bam ]
+        }
 
     SAMTOOLS_FASTA (
-        BWA_MEM.out.bam
+        ch_bam
     )
     ch_versions = ch_versions.mix(SAMTOOLS_FASTA.out.versions.first())
 
@@ -121,7 +112,6 @@ workflow BLATBOX {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()

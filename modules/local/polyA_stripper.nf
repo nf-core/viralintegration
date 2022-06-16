@@ -16,9 +16,10 @@ process POLYA_STRIPPER {
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     """
     fastq_polyA_stripper.py \\
+        --out_prefix ${meta.id} \\
         --left_fq ${reads[0]} \\
-        --right_fq ${reads[1]} \\
-        --out_prefix ${meta.id}
+        --right_fq ${reads[1]}
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

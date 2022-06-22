@@ -47,6 +47,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
+include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
@@ -80,6 +81,10 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
+    TRIMMOMATIC (
+        INPUT_CHECK.out.reads
+    )
+
     ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
                 file(params.viral_fasta, checkIfExists: true) ]
 
@@ -103,6 +108,7 @@ workflow VIRALINTEGRATION {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.log.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()

@@ -33,6 +33,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 */
 
 include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
+include { CAT_FASTA } from '../modules/local/cat_fasta'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -88,6 +90,11 @@ workflow VIRALINTEGRATION {
 
     ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
                 file(params.viral_fasta, checkIfExists: true) ]
+
+    CAT_FASTA(
+        params.fasta,
+        params.viral_fasta
+    )
 
     SAMTOOLS_FAIDX (
         ch_viral_fasta

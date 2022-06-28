@@ -93,7 +93,7 @@ workflow VIRALINTEGRATION {
     ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
                 file(params.viral_fasta, checkIfExists: true) ]
 
-    CAT_FASTA(
+    CAT_FASTA (
         params.fasta,
         params.viral_fasta
     )
@@ -102,8 +102,8 @@ workflow VIRALINTEGRATION {
         ch_viral_fasta
     )
 
-    POLYA_STRIPPER(
-        INPUT_CHECK.out.reads
+    POLYA_STRIPPER (
+        TRIMMOMATIC.out.trimmed_reads
     )
 
     fasta = file("https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta", checkIfExists: true)
@@ -113,8 +113,8 @@ workflow VIRALINTEGRATION {
         fasta, gtf
     )
 
-    STAR_ALIGN(
-        INPUT_CHECK.out.reads, 
+    STAR_ALIGN (
+        POLYA_STRIPPER.out.polya_trimmed,
         STAR_GENOMEGENERATE.out.index,
         gtf,
         false,

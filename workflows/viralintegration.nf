@@ -106,17 +106,15 @@ workflow VIRALINTEGRATION {
         TRIMMOMATIC.out.trimmed_reads
     )
 
-    gtf = file("https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.gtf", checkIfExists: true)
-
     STAR_GENOMEGENERATE (
         CAT_FASTA.out.plus_fasta,
-        gtf
+        params.gtf
     )
 
     STAR_ALIGN (
         POLYA_STRIPPER.out.polya_trimmed,
         STAR_GENOMEGENERATE.out.index,
-        gtf,
+        params.gtf,
         false,
         "illumina",
         false

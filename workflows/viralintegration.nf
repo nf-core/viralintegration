@@ -106,11 +106,11 @@ workflow VIRALINTEGRATION {
         TRIMMOMATIC.out.trimmed_reads
     )
 
-    fasta = file("https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta", checkIfExists: true)
     gtf = file("https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.gtf", checkIfExists: true)
 
     STAR_GENOMEGENERATE (
-        fasta, gtf
+        CAT_FASTA.out.plus_fasta,
+        gtf
     )
 
     STAR_ALIGN (

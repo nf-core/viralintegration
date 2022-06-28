@@ -1,18 +1,18 @@
 process POLYA_STRIPPER {
     tag "$meta.id"
 
-    conda (params.enable_conda ? "conda-forge::python=3.6.9" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        // HACK The script breaks under 3.8.3
-        'python:3.6.9' :
-        'python:3.6.9' }"
+    // TODO Use python 3.6.9 and pigz in their own container
+    if (params.enable_conda) {
+        exit 1, "Conda environments cannot be used when using the PolyA-stripper script. Please use docker or singularity containers."
+    }
+    container "trinityctat/ctat_vif"
 
     input:
     tuple val(meta), path(reads)
 
     output:
-    path '*.polyA-trimmed.fastq', emit: polya_trimmed
-    path "versions.yml"         , emit: versions
+    path '*.polyA-trimmed.fastq.gz', emit: polya_trimmed
+    path "versions.yml"            , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     """
@@ -21,6 +21,7 @@ process POLYA_STRIPPER {
         --left_fq ${reads[0]} \\
         --right_fq ${reads[1]}
 
+    pigz *.polyA-trimmed.fastq
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

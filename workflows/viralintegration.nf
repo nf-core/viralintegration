@@ -32,6 +32,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -90,6 +91,10 @@ workflow VIRALINTEGRATION {
 
     SAMTOOLS_FAIDX (
         ch_viral_fasta
+    )
+
+    POLYA_STRIPPER(
+        INPUT_CHECK.out.reads
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

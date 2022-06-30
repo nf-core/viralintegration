@@ -68,20 +68,33 @@ workflow BLATBOX {
 
     ch_versions = Channel.empty()
 
-    ch_bam = Channel.fromFilePairs(params.input, size: -1)
-        .map {
-            meta, bam ->
-            def fmeta = [:]
-            // Set meta.id
-            fmeta.id = meta
-            // Set meta.single_end
-            if (bam.size() == 1) {
-                fmeta.single_end = true
-            } else {
-                fmeta.single_end = false
-            }
-            [ fmeta, bam ]
+    ch_input = file(params.input, checkIfExists: true)
+    if (ch_input.isEmpty()) {exit 1, "File provided with --input is empty: ${ch_input.getName()}!"}
+
+    // Read in ids from --input file
+    Channel
+        .from(file(params.input, checkIfExists: true))
+        .splitCsv(header:false, sep:'', strip:true)
+        .map { it[0] }
+        .unique()
+        .set { ch_paths }
+
+    ch_paths
+
+    ch_bam = ch_paths.map {
+        bam ->
+        bam_file = file(bam, checkIfExists: true)
+        def fmeta = [:]
+        // Set meta.id
+        fmeta.id = bam_file.simpleName
+        // Set meta.single_end
+        if (bam_file.size() == 1) {
+            fmeta.single_end = true
+        } else {
+            fmeta.single_end = false
         }
+        [ fmeta, bam_file ]
+    }
 
     SAMTOOLS_FASTA (
         ch_bam

@@ -8,7 +8,7 @@ process INSERTION_SITE_CANDIDATES {
     container "trinityctat/ctat_vif"
 
     input:
-    tuple val(meta), path(bam), path(chimeric_junction)
+    tuple val(meta), path(bam), path(bai), path(chimeric_junction)
     path ref_genome_fasta
     path viral_fasta
 

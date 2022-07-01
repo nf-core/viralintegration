@@ -55,6 +55,8 @@ include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmom
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
 include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
 include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
+include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -121,14 +123,21 @@ workflow VIRALINTEGRATION {
         false
     )
 
-    // SAMTOOLS_SORT.out.bam
-    //     .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+    SAMTOOLS_SORT (
+        STAR_ALIGN.out.bam
+    )
 
-    //     .set { ch_bam_bai }
-    ch_bam_junction = STAR_ALIGN.out.bam.join(STAR_ALIGN.out.junction)
+    SAMTOOLS_INDEX (
+        SAMTOOLS_SORT.out.bam
+    )
+
+    SAMTOOLS_SORT.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(STAR_ALIGN.out.junction)
+        .set { ch_bam_bai_junction }
 
     INSERTION_SITE_CANDIDATES (
-        ch_bam_junction,
+        ch_bam_bai_junction,
         params.fasta,
         params.viral_fasta
     )

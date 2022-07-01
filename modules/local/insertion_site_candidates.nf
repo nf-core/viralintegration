@@ -14,7 +14,7 @@ process INSERTION_SITE_CANDIDATES {
 
     output:
     path "*.full.tsv"                    , emit: full
-    path "*.full.abridged.tsv"           , emit: full_abridged
+    path "*.full.abridged.tsv"           , optional: true, emit: full_abridged
     path "*.genome_chimeric_evidence.bam", emit: genome_chimeric_evidence_reads_bam
     path "*.genome_chimeric_evidence.bai", emit: genome_chimeric_evidence_reads_bai
     path "human_virus_chimJ.tsv"         , emit: human_virus_chimJ

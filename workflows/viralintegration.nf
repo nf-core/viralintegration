@@ -34,6 +34,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 
 include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 include { CAT_FASTA } from '../modules/local/cat_fasta'
+include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -119,6 +120,19 @@ workflow VIRALINTEGRATION {
         "illumina",
         false
     )
+
+    // SAMTOOLS_SORT.out.bam
+    //     .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+
+    //     .set { ch_bam_bai }
+
+    // TODO INSERTION_SITE_CANDIDATES (
+
+    // )
+
+    // TODO ABRIDGED_TSV (
+
+    // )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

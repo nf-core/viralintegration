@@ -16,6 +16,7 @@ process ABRIDGED_TSV {
     path "versions.yml"                  , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
+    def prefix = task.ext.prefix ?: "${meta.id}.vif.init"
     """
     #!/usr/bin/env python
 

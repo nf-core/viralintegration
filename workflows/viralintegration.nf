@@ -126,9 +126,12 @@ workflow VIRALINTEGRATION {
 
     //     .set { ch_bam_bai }
 
-    // TODO INSERTION_SITE_CANDIDATES (
-
-    // )
+    INSERTION_SITE_CANDIDATES (
+        STAR_ALIGN.out.junction,
+        STAR_ALIGN.out.bam,
+        params.fasta,
+        params.viral_fasta
+    )
 
     // TODO ABRIDGED_TSV (
 

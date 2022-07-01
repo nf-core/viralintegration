@@ -57,6 +57,8 @@ process INSERTION_SITE_CANDIDATES {
         --viral_genome_fasta ${viral_fasta} \\
         --output ${prefix}.full.tsv
 
+    rm ${prefix}.tmp.full.tsv
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version | sed 's/Python //g')

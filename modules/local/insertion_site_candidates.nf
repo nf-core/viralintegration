@@ -23,6 +23,8 @@ process INSERTION_SITE_CANDIDATES {
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     // TODO Move to modules.config?
     def prefix = task.ext.prefix ?: "${meta.id}.vif.init"
+    def remove_duplicates = '--remove_duplicates'
+    // TODO remove duplicates option
     """
     pre_filter_non_human_virus_chimeric_alignments.py  \\
         --chimJ ${chimeric_junction} \\
@@ -34,7 +36,7 @@ process INSERTION_SITE_CANDIDATES {
         --viral_db_fasta ${viral_fasta} \\
         --max_multi_read_alignments ${params.max_hits} \\
         --output_prefix ${prefix}.tmp \\
-        ~{true='--remove_duplicates' false='' remove_duplicates}
+        ${remove_duplicates}
 
     # extract the chimeric read alignments:
     extract_prelim_chimeric_genome_read_alignments.py \\

@@ -33,7 +33,7 @@ process INSERTION_SITE_CANDIDATES {
     chimJ_to_virus_insertion_candidate_sites.py \\
         --chimJ human_virus_chimJ.tsv \\
         --viral_db_fasta ${viral_fasta} \\
-        --max_multi_read_alignments ${max_hits} \\
+        --max_multi_read_alignments ${params.max_hits} \\
         --output_prefix ${prefix}.tmp \\
         ~{true='--remove_duplicates' false='' remove_duplicates}
 

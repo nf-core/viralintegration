@@ -13,7 +13,7 @@ process ABRIDGED_TSV {
     output:
     path "*.filtered.tsv"                , emit: filtered
     path "*.filtered.abridged.tsv"       , emit: filtered_abridged
-    path "versions.yml"                  , emit: versions
+    // TODO path "versions.yml"                  , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     def prefix = task.ext.prefix ?: "${meta.id}.vif.init"
@@ -25,13 +25,13 @@ process ABRIDGED_TSV {
     #max_hits = ${params.max_hits}
 
     # write abridged tsv
-    df = pd.read_csv("$full_tsv", sep="\t")
-    df.drop('readnames', axis=1).to_csv("${prefix}.full.abridged.tsv", sep="\t", index=False)
+    df = pd.read_csv("$full_tsv", sep="\\t")
+    df.drop('readnames', axis=1).to_csv("${prefix}.full.abridged.tsv", sep="\\t", index=False)
 
     #df = df[ (df.hits <= max_hits) & (df.total >= min_reads)]
     df = df[ df.total >= min_reads ]
 
-    df.to_csv("${prefix}.filtered.tsv", sep="\t", index=False)
-    df.drop('readnames', axis=1).to_csv("${prefix}.filtered.abridged.tsv", sep="\t", index=False)
+    df.to_csv("${prefix}.filtered.tsv", sep="\\t", index=False)
+    df.drop('readnames', axis=1).to_csv("${prefix}.filtered.abridged.tsv", sep="\\t", index=False)
     """
 }

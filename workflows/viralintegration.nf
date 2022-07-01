@@ -35,6 +35,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 include { CAT_FASTA } from '../modules/local/cat_fasta'
 include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
+include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -142,9 +143,9 @@ workflow VIRALINTEGRATION {
         params.viral_fasta
     )
 
-    // TODO ABRIDGED_TSV (
-
-    // )
+    ABRIDGED_TSV (
+        INSERTION_SITE_CANDIDATES.out.full
+    )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

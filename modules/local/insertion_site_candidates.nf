@@ -13,12 +13,12 @@ process INSERTION_SITE_CANDIDATES {
     path viral_fasta
 
     output:
-    path "*.full.tsv"                        , emit: full
-    path "*.full.abridged.tsv"               , optional: true, emit: full_abridged
-    path "*.genome_chimeric_evidence.bam"    , emit: genome_chimeric_evidence_reads_bam
-    path "*.genome_chimeric_evidence.bam.bai", emit: genome_chimeric_evidence_reads_bai
-    path "human_virus_chimJ.tsv"             , emit: human_virus_chimJ
-    path "versions.yml"                      , emit: versions
+    tuple val(meta), path ("*.full.tsv")                        , emit: full
+    tuple val(meta), path ("*.full.abridged.tsv")               , optional: true, emit: full_abridged
+    tuple val(meta), path ("*.genome_chimeric_evidence.bam")    , emit: genome_chimeric_evidence_reads_bam
+    tuple val(meta), path ("*.genome_chimeric_evidence.bam.bai"), emit: genome_chimeric_evidence_reads_bai
+    tuple val(meta), path ("human_virus_chimJ.tsv")             , emit: human_virus_chimJ
+    path "versions.yml"                                         , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     // TODO Move to modules.config?

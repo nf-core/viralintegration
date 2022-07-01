@@ -125,10 +125,10 @@ workflow VIRALINTEGRATION {
     //     .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
 
     //     .set { ch_bam_bai }
+    ch_bam_junction = STAR_ALIGN.out.bam.join(STAR_ALIGN.out.junction)
 
     INSERTION_SITE_CANDIDATES (
-        STAR_ALIGN.out.junction,
-        STAR_ALIGN.out.bam,
+        ch_bam_junction,
         params.fasta,
         params.viral_fasta
     )

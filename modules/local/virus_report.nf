@@ -30,15 +30,15 @@ process VIRUS_REPORT {
     def remove_duplicates = '--remove_duplicates'
     // TODO remove duplicates option
     """
-    make_VIF_genome_abundance_plot.Rscript \
-        --vif_report ${insertion_site_candidates} \
-        --title "Preliminary Genome Wide Abundance" \
+    make_VIF_genome_abundance_plot.Rscript \\
+        --vif_report ${insertion_site_candidates} \\
+        --title "Preliminary Genome Wide Abundance" \\
         --output_png ${prefix}.init.genome_plot.png
 
     ## restrict bam to only viruses of interest
         bam=${bam}
         samtools faidx ${viral_fasta}
-        awk '{printf("%s\t0\t%s\n",$1,$2);}' ${viral_fasta}.fai  > viruses.bed
+        awk '{printf("%s\t0\t%s\\n",\$1,\$2);}' ${viral_fasta}.fai  > viruses.bed
         samtools view -b -L viruses.bed ${bam} -o ${prefix}.igvjs.bam
         bam="~{prefix}.igvjs.bam"
         samtools index ${bam}
@@ -56,42 +56,42 @@ process VIRUS_REPORT {
         fi
 
     # generates read_counts_summary and images
-    plot_top_virus_coverage.Rscript \
-        --vif_report ${insertion_site_candidates}  \
-        --virus_fai ${viral_fasta}.fai \
-        --bam ${bam} \
+    plot_top_virus_coverage.Rscript \\
+        --vif_report ${insertion_site_candidates}  \\
+        --virus_fai ${viral_fasta}.fai \\
+        --bam ${bam} \\
         --utildir ${util_dir} \
         --output_prefix ${prefix}
 
     if [[ -s "${prefix}.virus_read_counts_summary.tsv" ]] ; then
         # make bed for igvjs
-        create_igvjs_virus_bed.py \
-            --summary ${prefix}.virus_read_counts_summary.tsv \
-            --output_prefix ${prefix} \
+        create_igvjs_virus_bed.py \\
+            --summary ${prefix}.virus_read_counts_summary.tsv \\
+            --output_prefix ${prefix} \\
             --num_top_viruses ${num_top_viruses}
 
-    create_insertion_site_inspector_js.py \
-        --VIF_summary_tsv ${prefix}.igvjs.table.tsv \
+    create_insertion_site_inspector_js.py \\
+        --VIF_summary_tsv ${prefix}.igvjs.table.tsv \\
         --json_outfile ${prefix}.igvjs.json
 
     # prep for making the report
-    bamsifter/bamsifter \
-        -c ${max_coverage} \
-        -o ${prefix}.igvjs.reads.bam \
+    bamsifter/bamsifter \\
+        -c ~{max_coverage} \\
+        -o ${prefix}.igvjs.reads.bam \\
         ${bam}
 
     # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
     #ln -sf ${viral_fasta} ${prefix}.virus.fa
-    create_igvjs_virus_fa.py \
-        ${prefix}.igvjs.bed \
-        ${viral_fasta}  \
+    create_igvjs_virus_fa.py \\
+        ${prefix}.igvjs.bed \\
+        ${viral_fasta}  \\
         ${prefix}.igvjs.fa
 
     # generate the html
-    make_VIF_igvjs_html.py \
-        --html_template ${util_dir}/resources/igvjs_VIF.html \
-        --fusions_json ${prefix}.igvjs.json \
-        --input_file_prefix ${prefix}.igvjs \
+    make_VIF_igvjs_html.py \\
+        --html_template ${util_dir}/resources/igvjs_VIF.html \\
+        --fusions_json ${prefix}.igvjs.json \\
+        --input_file_prefix ${prefix}.igvjs \\
         --html_output ${prefix}.igvjs.html
 
     cat <<-END_VERSIONS > versions.yml

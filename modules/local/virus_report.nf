@@ -29,6 +29,8 @@ process VIRUS_REPORT {
     def prefix = task.ext.prefix ?: "${meta.id}.VirusDetect"
     def remove_duplicates = '--remove_duplicates'
     // TODO remove duplicates option
+    def util_dir = '--util_dir'
+    def num_top_viruses = '--num_top_viruses '
     """
     make_VIF_genome_abundance_plot.Rscript \\
         --vif_report ${insertion_site_candidates} \\
@@ -60,7 +62,7 @@ process VIRUS_REPORT {
         --vif_report ${insertion_site_candidates}  \\
         --virus_fai ${viral_fasta}.fai \\
         --bam ${bam} \\
-        --utildir ${util_dir} \
+        ${util_dir} \\
         --output_prefix ${prefix}
 
     if [[ -s "${prefix}.virus_read_counts_summary.tsv" ]] ; then
@@ -68,7 +70,7 @@ process VIRUS_REPORT {
         create_igvjs_virus_bed.py \\
             --summary ${prefix}.virus_read_counts_summary.tsv \\
             --output_prefix ${prefix} \\
-            --num_top_viruses ${num_top_viruses}
+            ${num_top_viruses}
 
     create_insertion_site_inspector_js.py \\
         --VIF_summary_tsv ${prefix}.igvjs.table.tsv \\

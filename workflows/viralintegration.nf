@@ -25,6 +25,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 
 ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
+ch_igvjs_VIF             = file("$projectDir/assets/igvjs_VIF.html", checkIfExists: true)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,7 +153,8 @@ workflow VIRALINTEGRATION {
         STAR_ALIGN.out.bam,
         SAMTOOLS_INDEX.out.bai,
         params.viral_fasta,
-        ABRIDGED_TSV.out.filtered_abridged
+        ABRIDGED_TSV.out.filtered_abridged,
+        ch_igvjs_VIF
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

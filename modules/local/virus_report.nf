@@ -11,7 +11,8 @@ process VIRUS_REPORT {
     tuple val(meta), path(bam)
     tuple val(meta), path(bai)
     path viral_fasta
-    path(insertion_site_candidates)
+    path insertion_site_candidates
+    path igvjs_VIF
 
     output:
     tuple val(meta), path ("*.igvjs.html")                    , emit: html
@@ -89,10 +90,11 @@ process VIRUS_REPORT {
 
     # generate the html
     make_VIF_igvjs_html.py \\
-        --html_template ${util_dir}/resources/igvjs_VIF.html \\
-        --fusions_json ${prefix}.igvjs.json \\
-        --input_file_prefix ${prefix}.igvjs \\
-        --html_output ${prefix}.igvjs.html
+            --html_template $igvjs_VIF \\
+            --fusions_json ${prefix}.igvjs.json \\
+            --input_file_prefix ${prefix}.igvjs \\
+            --html_output ${prefix}.igvjs.html
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

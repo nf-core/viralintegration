@@ -36,32 +36,31 @@ process VIRUS_REPORT {
         --title "Preliminary Genome Wide Abundance" \\
         --output_png ${prefix}.init.genome_plot.png
 
-    ## restrict bam to only viruses of interest
-        bam=${bam}
-        samtools faidx ${viral_fasta}
-        awk '{printf("%s\t0\t%s\\n",\$1,\$2);}' ${viral_fasta}.fai  > viruses.bed
-        samtools view -b -L viruses.bed ${bam} -o ${prefix}.igvjs.bam
-        bam="~{prefix}.igvjs.bam"
-        samtools index ${bam}
+    # restrict bam to only viruses of interest
+    bam=${bam}
+    samtools faidx ${viral_fasta}
+    awk '{printf("%s\t0\t%s\\n",\$1,\$2);}' ${viral_fasta}.fai  > viruses.bed
+    samtools view -b -L viruses.bed \$bam -o ${prefix}.igvjs.bam
+    bam="${prefix}.igvjs.bam"
+    samtools index \$bam
 
     # clean up the bam, restrict to proper pairs and non-supplemental alignments
-    restrict_bam_to_proper_aligns.py ${bam} ${bam}.clean.bam
-        mv ${bam}.clean.bam ${bam}
-        mv ${bam}.clean.bam.bai ${bam}.bai
+    restrict_bam_to_proper_aligns.py \$bam \${bam}.clean.bam
+    mv \${bam}.clean.bam \${bam}
+    mv \${bam}.clean.bam.bai \${bam}.bai
 
 
     if [ "${remove_duplicates}" == "true" ]; then
-    bam_mark_duplicates.py -i ${bam} -o dups.removed.bam -r
+        bam_mark_duplicates.py -i ${bam} -o dups.removed.bam -r
         mv dups.removed.bam  ${bam}
         samtools index ${bam}
-        fi
+    fi
 
     # generates read_counts_summary and images
     plot_top_virus_coverage.R \\
         --vif_report ${insertion_site_candidates}  \\
         --virus_fai ${viral_fasta}.fai \\
-        --bam ${bam} \\
-        ${util_dir} \\
+        --bam \${bam} \\
         --output_prefix ${prefix}
 
     if [[ -s "${prefix}.virus_read_counts_summary.tsv" ]] ; then
@@ -79,7 +78,7 @@ process VIRUS_REPORT {
     bamsifter/bamsifter \\
         -c 100 \\
         -o ${prefix}.igvjs.reads.bam \\
-        ${bam}
+        \${bam}
 
     # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
     #ln -sf ${viral_fasta} ${prefix}.virus.fa

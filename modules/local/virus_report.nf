@@ -32,7 +32,7 @@ process VIRUS_REPORT {
     def util_dir = '--util_dir'
     def num_top_viruses = '--num_top_viruses '
     """
-    make_VIF_genome_abundance_plot.Rscript \\
+    make_VIF_genome_abundance_plot.R \\
         --vif_report ${insertion_site_candidates} \\
         --title "Preliminary Genome Wide Abundance" \\
         --output_png ${prefix}.init.genome_plot.png
@@ -58,7 +58,7 @@ process VIRUS_REPORT {
         fi
 
     # generates read_counts_summary and images
-    plot_top_virus_coverage.Rscript \\
+    plot_top_virus_coverage.R \\
         --vif_report ${insertion_site_candidates}  \\
         --virus_fai ${viral_fasta}.fai \\
         --bam ${bam} \\

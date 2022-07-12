@@ -29,8 +29,7 @@ process VIRUS_REPORT {
     def prefix = task.ext.prefix ?: "${meta.id}.VirusDetect"
     def remove_duplicates = '--remove_duplicates'
     // TODO remove duplicates option
-    def util_dir = '--util_dir'
-    def num_top_viruses = '--num_top_viruses '
+    def num_top_viruses = '--num_top_viruses 20'
     """
     make_VIF_genome_abundance_plot.R \\
         --vif_report ${insertion_site_candidates} \\
@@ -78,7 +77,7 @@ process VIRUS_REPORT {
 
     # prep for making the report
     bamsifter/bamsifter \\
-        -c ~{max_coverage} \\
+        -c 100 \\
         -o ${prefix}.igvjs.reads.bam \\
         ${bam}
 

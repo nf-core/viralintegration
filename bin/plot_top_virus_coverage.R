@@ -10,7 +10,6 @@ parser$add_argument("--bam", help="alignments in sorted bam file", required=TRUE
 parser$add_argument("--virus_fai", help="virus fasta fai file", required=TRUE, nargs=1)
 parser$add_argument("--output_prefix", help="output prefix for png and tsv filenames", required=TRUE, nargs=1)
 parser$add_argument("--depth", action="store_true", dest="depth", help="Create depth plots")
-parser$add_argument("--utildir", help="util directory", nargs=1, required=TRUE)
 
 args = parser$parse_args()
 
@@ -20,7 +19,6 @@ bam_file = args$bam
 virus_fai_file = args$virus_fai
 output_prefix = args$output_prefix
 depth_plots = args$depth
-utildir = args$utildir
 
 library(tidyverse)
 
@@ -117,7 +115,7 @@ read_depth_df = NULL
 for (virus in virus_count_info$virus) {
     message("-examining coverage depth for virus:", virus)
     depth_file =  "depth.tsv"
-    depth_script_py = paste0(utildir, "/sam_depth_ignore_gaps.py")
+    depth_script_py = "sam_depth_ignore_gaps.py"
     cmd = paste("bash -c \'set -eou pipefail && samtools view -h ", bam_file, paste0('"', virus, '"'), " | ", depth_script_py, " - >", depth_file, '\'')
     run_command(cmd)
     n_bases_covered = 0

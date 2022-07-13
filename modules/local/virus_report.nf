@@ -72,29 +72,29 @@ process VIRUS_REPORT {
             --output_prefix ${prefix} \\
             ${num_top_viruses}
 
-    create_insertion_site_inspector_js.py \\
-        --VIF_summary_tsv ${prefix}.igvjs.table.tsv \\
-        --json_outfile ${prefix}.igvjs.json
+        create_insertion_site_inspector_js.py \\
+            --VIF_summary_tsv ${prefix}.igvjs.table.tsv \\
+            --json_outfile ${prefix}.igvjs.json
 
-    # prep for making the report
-    bamsifter/bamsifter \\
-        -c 100 \\
-        -o ${prefix}.igvjs.reads.bam \\
-        \${bam}
+        # prep for making the report
+        bamsifter/bamsifter \\
+            -c 100 \\
+            -o ${prefix}.igvjs.reads.bam \\
+            \${bam}
 
-    # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
-    #ln -sf ${viral_fasta} ${prefix}.virus.fa
-    create_igvjs_virus_fa.py \\
-        ${prefix}.igvjs.bed \\
-        ${viral_fasta}  \\
-        ${prefix}.igvjs.fa
+        # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
+        #ln -sf ${viral_fasta} ${prefix}.virus.fa
+        create_igvjs_virus_fa.py \\
+            ${prefix}.igvjs.bed \\
+            ${viral_fasta}  \\
+            ${prefix}.igvjs.fa
 
-    # generate the html
-    make_VIF_igvjs_html.py \\
-            --html_template $igvjs_VIF \\
-            --fusions_json ${prefix}.igvjs.json \\
-            --input_file_prefix ${prefix}.igvjs \\
-            --html_output ${prefix}.igvjs.html
+        # generate the html
+        make_VIF_igvjs_html.py \\
+                --html_template $igvjs_VIF \\
+                --fusions_json ${prefix}.igvjs.json \\
+                --input_file_prefix ${prefix}.igvjs \\
+                --html_output ${prefix}.igvjs.html
     fi
 
     cat <<-END_VERSIONS > versions.yml

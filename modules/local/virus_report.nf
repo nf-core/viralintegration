@@ -15,7 +15,7 @@ process VIRUS_REPORT {
     path igvjs_VIF
 
     output:
-    tuple val(meta), path ("*.igvjs.html")                    , emit: html
+    tuple val(meta), path ("*.igvjs.html")                    , optional: true, emit: html
     tuple val(meta), path ("*.init.genome_plot.png")          , emit: genome_abundance_plot
     tuple val(meta), path ("*.igvjs.bam")                     , emit: virus_alignments_bam
     tuple val(meta), path ("*.igvjs.bam.bai")                 , emit: virus_alignments_bai

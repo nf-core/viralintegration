@@ -42,7 +42,8 @@ process VIRUS_REPORT {
     samtools faidx ${viral_fasta}
     awk '{printf("%s\t0\t%s\\n",\$1,\$2);}' ${viral_fasta}.fai  > viruses.bed
     samtools view -b -L viruses.bed \$bam -o ${prefix}.igvjs.bam
-    bam="${prefix}.igvjs.bam"
+    samtools sort -o ${prefix}.sorted.igvjs.bam -T $prefix ${prefix}.igvjs.bam
+    bam="${prefix}.sorted.igvjs.bam"
     samtools index \$bam
 
     # clean up the bam, restrict to proper pairs and non-supplemental alignments

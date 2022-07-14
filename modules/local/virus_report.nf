@@ -19,10 +19,10 @@ process VIRUS_REPORT {
     tuple val(meta), path ("*.init.genome_plot.png")          , emit: genome_abundance_plot
     tuple val(meta), path ("*.igvjs.bam")                     , emit: virus_alignments_bam
     tuple val(meta), path ("*.igvjs.bam.bai")                 , emit: virus_alignments_bai
-    tuple val(meta), path ("*.virus_read_counts_summary.tsv") , emit: read_counts_summary
+    tuple val(meta), path ("*.virus_read_counts_summary.tsv") , optional: true, emit: read_counts_summary
     tuple val(meta), path ("*.virus_read_counts.png")         , emit: read_counts_image
     tuple val(meta), path ("*.virus_read_counts_log.png")     , emit: read_counts_log_image
-    tuple val(meta), path ("*.virus_coverage_*.png")          , emit: virus_images
+    tuple val(meta), path ("*.virus_coverage_*.png")          , optional: true, emit: virus_images
     path "versions.yml"                                       , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/

@@ -77,10 +77,12 @@ process VIRUS_REPORT {
             --json_outfile ${prefix}.igvjs.json
 
         # prep for making the report
-        bamsifter/bamsifter \\
-            -c 100 \\
-            -o ${prefix}.igvjs.reads.bam \\
-            \${bam}
+        # bamsifter \\
+        #    -c 100 \\
+        #   -o ${prefix}.igvjs.reads.bam \\
+        #    \${bam}
+
+        cp \${bam} ${prefix}.igvjs.reads.bam
 
         # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
         #ln -sf ${viral_fasta} ${prefix}.virus.fa

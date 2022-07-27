@@ -52,6 +52,8 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
+include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
+include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -91,7 +93,7 @@ workflow VIRALINTEGRATION {
     ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
                 file(params.viral_fasta, checkIfExists: true) ]
 
-    CAT_FASTA(
+    CAT_FASTA (
         params.fasta,
         params.viral_fasta
     )
@@ -100,8 +102,22 @@ workflow VIRALINTEGRATION {
         ch_viral_fasta
     )
 
-    POLYA_STRIPPER(
-        INPUT_CHECK.out.reads
+    POLYA_STRIPPER (
+        TRIMMOMATIC.out.trimmed_reads
+    )
+
+    STAR_GENOMEGENERATE (
+        CAT_FASTA.out.plus_fasta,
+        params.gtf
+    )
+
+    STAR_ALIGN (
+        POLYA_STRIPPER.out.polya_trimmed,
+        STAR_GENOMEGENERATE.out.index,
+        params.gtf,
+        false,
+        "illumina",
+        false
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

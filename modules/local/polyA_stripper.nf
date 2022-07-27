@@ -11,8 +11,8 @@ process POLYA_STRIPPER {
     tuple val(meta), path(reads)
 
     output:
-    path '*.polyA-trimmed.fastq.gz', emit: polya_trimmed
-    path "versions.yml"            , emit: versions
+    tuple val(meta), path('*.polyA-trimmed.fastq.gz'), emit: polya_trimmed
+    path "versions.yml"                              , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     """

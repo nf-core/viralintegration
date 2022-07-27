@@ -25,6 +25,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 
 ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
+ch_igvjs_VIF             = file("$projectDir/assets/igvjs_VIF.html", checkIfExists: true)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,6 +37,7 @@ include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 include { CAT_FASTA } from '../modules/local/cat_fasta'
 include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
 include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
+include { VIRUS_REPORT } from '../modules/local/virus_report'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -145,6 +147,14 @@ workflow VIRALINTEGRATION {
 
     ABRIDGED_TSV (
         INSERTION_SITE_CANDIDATES.out.full
+    )
+
+    VIRUS_REPORT (
+        STAR_ALIGN.out.bam,
+        SAMTOOLS_INDEX.out.bai,
+        params.viral_fasta,
+        ABRIDGED_TSV.out.filtered_abridged,
+        ch_igvjs_VIF
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

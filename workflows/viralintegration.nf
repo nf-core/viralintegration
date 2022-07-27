@@ -34,6 +34,8 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 
 include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 include { CAT_FASTA } from '../modules/local/cat_fasta'
+include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
+include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -54,6 +56,8 @@ include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmom
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
 include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
 include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
+include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -118,6 +122,29 @@ workflow VIRALINTEGRATION {
         false,
         "illumina",
         false
+    )
+
+    SAMTOOLS_SORT (
+        STAR_ALIGN.out.bam
+    )
+
+    SAMTOOLS_INDEX (
+        SAMTOOLS_SORT.out.bam
+    )
+
+    SAMTOOLS_SORT.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(STAR_ALIGN.out.junction)
+        .set { ch_bam_bai_junction }
+
+    INSERTION_SITE_CANDIDATES (
+        ch_bam_bai_junction,
+        params.fasta,
+        params.viral_fasta
+    )
+
+    ABRIDGED_TSV (
+        INSERTION_SITE_CANDIDATES.out.full
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

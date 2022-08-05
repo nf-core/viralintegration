@@ -38,6 +38,7 @@ include { CAT_FASTA } from '../modules/local/cat_fasta'
 include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
 include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 include { VIRUS_REPORT } from '../modules/local/virus_report'
+include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -155,6 +156,12 @@ workflow VIRALINTEGRATION {
         params.viral_fasta,
         ABRIDGED_TSV.out.filtered_abridged,
         ch_igvjs_VIF
+    )
+
+    EXTRACT_CHIMERIC_GENOMIC_TARGETS (
+        params.fasta,
+        params.viral_fasta,
+        ABRIDGED_TSV.out.filtered_abridged
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

@@ -230,9 +230,10 @@ def parse_chim_events(chim_events_filename):
         reader = csv.DictReader(fh, delimiter="\t")
         for row in reader:
             event_num = row["entry"]
-            # only examining primary entries
-            if row["is_primary"] != "False":
-                event_info_dict[event_num] = row
+            #TODO "is_primary" is not a field in the CSV - find and fix if needed
+            #  only examining primary entries
+            # if row["is_primary"] != "False":
+            #     event_info_dict[event_num] = row
 
     return event_info_dict
 

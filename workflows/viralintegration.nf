@@ -59,7 +59,9 @@ include { FASTQC                      } from '../modules/nf-core/modules/fastqc/
 include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
 include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
+include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HG } from '../modules/nf-core/modules/star/genomegenerate/main'
 include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
+include { STAR_ALIGN as STAR_ALIGN_HG } from '../modules/nf-core/modules/star/align/main'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
 include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
@@ -94,8 +96,26 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
+    STAR_GENOMEGENERATE_HG (
+        params.hg_fasta,
+        params.gtf
+    )
+
+    STAR_ALIGN_HG (
+        INPUT_CHECK.out.reads,
+        STAR_GENOMEGENERATE_HG.out.index,
+        params.gtf,
+        false,
+        "illumina",
+        false
+    )
+
     TRIMMOMATIC (
-        INPUT_CHECK.out.reads
+        STAR_ALIGN_HG.out.fastq
+    )
+
+    POLYA_STRIPPER (
+        TRIMMOMATIC.out.trimmed_reads
     )
 
     ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
@@ -108,10 +128,6 @@ workflow VIRALINTEGRATION {
 
     SAMTOOLS_FAIDX (
         ch_viral_fasta
-    )
-
-    POLYA_STRIPPER (
-        TRIMMOMATIC.out.trimmed_reads
     )
 
     STAR_GENOMEGENERATE (
@@ -164,10 +180,6 @@ workflow VIRALINTEGRATION {
         params.viral_fasta,
         ABRIDGED_TSV.out.filtered_abridged
     )
-
-    STAR_VALIDATE (
-        STAR_ALIGN.out.fastq
-            )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

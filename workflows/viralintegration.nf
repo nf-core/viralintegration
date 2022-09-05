@@ -39,7 +39,6 @@ include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_cand
 include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 include { VIRUS_REPORT } from '../modules/local/virus_report'
 include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
-include { STAR_VALIDATE } from '../modules/local/star_validate'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -62,6 +61,7 @@ include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/ge
 include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HG } from '../modules/nf-core/modules/star/genomegenerate/main'
 include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
 include { STAR_ALIGN as STAR_ALIGN_HG } from '../modules/nf-core/modules/star/align/main'
+include { STAR_ALIGN as STAR_ALIGN_VALIDATE } from '../modules/nf-core/modules/star/align/main'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
 include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
@@ -179,6 +179,15 @@ workflow VIRALINTEGRATION {
         params.fasta,
         params.viral_fasta,
         ABRIDGED_TSV.out.filtered_abridged
+    )
+
+    STAR_ALIGN_VALIDATE (
+        STAR_ALIGN_HG.out.fastq,
+        STAR_GENOMEGENERATE.out.index,
+        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract,
+        false,
+        "illumina",
+        false
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

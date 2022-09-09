@@ -11,8 +11,8 @@ process ABRIDGED_TSV {
     tuple val(meta), path(full_tsv)
 
     output:
-    path "*.filtered.tsv"                , emit: filtered
-    path "*.filtered.abridged.tsv"       , emit: filtered_abridged
+    tuple val(meta), path("*.filtered.tsv")                , emit: filtered
+    tuple val(meta), path("*.filtered.abridged.tsv")       , emit: filtered_abridged
     // TODO path "versions.yml"                  , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/

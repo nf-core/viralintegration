@@ -8,13 +8,13 @@ process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
     container "trinityctat/ctat_vif"
 
     input:
+    tuple val(meta), path(insertion_site_candidates_abridged)
     path fasta
     path viral_fasta
-    path insertion_site_candidates_abridged
 
     output:
-    path ("*.fasta")                           , emit: fasta_extract
-    path ("*.gtf")                             , emit: gtf_extract
+    tuple val(meta), path ("*.fasta")          , emit: fasta_extract
+    tuple val(meta), path ("*.gtf")            , emit: gtf_extract
     path "versions.yml"                        , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/

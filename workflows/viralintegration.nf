@@ -167,18 +167,21 @@ workflow VIRALINTEGRATION {
         INSERTION_SITE_CANDIDATES.out.full
     )
 
+    SAMTOOLS_SORT.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(ABRIDGED_TSV.out.filtered_abridged)
+        .set { ch_bam_bai_filtered }
+
     VIRUS_REPORT (
-        STAR_ALIGN.out.bam,
-        SAMTOOLS_INDEX.out.bai,
+        ch_bam_bai_filtered,
         params.viral_fasta,
-        ABRIDGED_TSV.out.filtered_abridged,
         ch_igvjs_VIF
     )
 
     EXTRACT_CHIMERIC_GENOMIC_TARGETS (
+        ABRIDGED_TSV.out.filtered_abridged,
         params.fasta,
-        params.viral_fasta,
-        ABRIDGED_TSV.out.filtered_abridged
+        params.viral_fasta
     )
 
     STAR_ALIGN_VALIDATE (

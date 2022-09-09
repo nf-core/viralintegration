@@ -1,6 +1,9 @@
 process STAR_ALIGN_VALIDATE {
     tag "$meta.id"
     label 'process_high'
+    errorStrategy { task.exitStatus in [104] ? 'ignore'
+                   : task.exitStatus in [143,137,104,134,139] ? 'retry'
+                   : 'finish' }
 
     // Note: 2.7X indices incompatible with AWS iGenomes.
     conda (params.enable_conda ? 'bioconda::star=2.7.9a' : null)

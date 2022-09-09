@@ -58,10 +58,10 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
-include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
-include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HG } from '../modules/nf-core/modules/star/genomegenerate/main'
-include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
-include { STAR_ALIGN as STAR_ALIGN_HG } from '../modules/nf-core/modules/star/align/main'
+include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
+          STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/modules/star/genomegenerate/main'
+include { STAR_ALIGN as STAR_ALIGN_HOST
+          STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/modules/star/align/main'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
 include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
@@ -96,14 +96,15 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
-    STAR_GENOMEGENERATE_HG (
-        params.hg_fasta,
+    STAR_GENOMEGENERATE_HOST (
+        params.fasta,
         params.gtf
     )
 
-    STAR_ALIGN_HG (
+    // TODO Use igenomes
+    STAR_ALIGN_HOST (
         INPUT_CHECK.out.reads,
-        STAR_GENOMEGENERATE_HG.out.index,
+        STAR_GENOMEGENERATE_HOST.out.index,
         params.gtf,
         false,
         "illumina",
@@ -111,7 +112,7 @@ workflow VIRALINTEGRATION {
     )
 
     TRIMMOMATIC (
-        STAR_ALIGN_HG.out.fastq
+        STAR_ALIGN_HOST.out.fastq
     )
 
     POLYA_STRIPPER (
@@ -130,14 +131,14 @@ workflow VIRALINTEGRATION {
         ch_viral_fasta
     )
 
-    STAR_GENOMEGENERATE (
+    STAR_GENOMEGENERATE_PLUS (
         CAT_FASTA.out.plus_fasta,
         params.gtf
     )
 
-    STAR_ALIGN (
+    STAR_ALIGN_PLUS (
         POLYA_STRIPPER.out.polya_trimmed,
-        STAR_GENOMEGENERATE.out.index,
+        STAR_GENOMEGENERATE_PLUS.out.index,
         params.gtf,
         false,
         "illumina",
@@ -145,7 +146,7 @@ workflow VIRALINTEGRATION {
     )
 
     SAMTOOLS_SORT (
-        STAR_ALIGN.out.bam
+        STAR_ALIGN_PLUS.out.bam
     )
 
     SAMTOOLS_INDEX (
@@ -154,7 +155,7 @@ workflow VIRALINTEGRATION {
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(STAR_ALIGN.out.junction)
+        .join(STAR_ALIGN_PLUS.out.junction)
         .set { ch_bam_bai_junction }
 
     INSERTION_SITE_CANDIDATES (
@@ -184,12 +185,12 @@ workflow VIRALINTEGRATION {
         params.viral_fasta
     )
 
-    STAR_ALIGN_HG.out.fastq
+    STAR_ALIGN_HOST.out.fastq
         .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract)
         .set { ch_unaligned_fastq_fasta }
     STAR_ALIGN_VALIDATE (
         ch_unaligned_fastq_fasta,
-        STAR_GENOMEGENERATE.out.index,
+        STAR_GENOMEGENERATE_PLUS.out.index,
         "illumina",
         false
     )

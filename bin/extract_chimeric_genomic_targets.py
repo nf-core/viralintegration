@@ -69,7 +69,15 @@ def main():
         logger.error("Error {} not found".format(ref_genome_fasta))
         sys.exit(1)
 
+# Pass in or create fai for both fasta files #
+    ref_genome_fai = ref_genome_fasta + ".fai"
+    if not os.path.exists(ref_genome_fai):
+        cmd = "samtools faidx {}".format(ref_genome_fasta)
 
+    patch_db_fai = patch_db_fasta + ".fai"
+    if not os.path.exists(patch_db_fai):
+        cmd = "samtools faidx {}".format(patch_db_fasta)
+# TODO Would it be cleaner to do this in the workflow instead? #
 
     event_info_dict = parse_chim_events(chim_events_filename)
 
@@ -208,7 +216,7 @@ def write_genome_target_regions(
 
 def extract_seq_region(fasta_filename, chr, lend, rend, orient):
 
-    cmd = 'samtools faidx {} "{}":{}-{}'.format(fasta_filename, chr, lend, rend, orient)
+    cmd = 'samtools faidx {} "{}":{}-{} "{}"'.format(fasta_filename, chr, lend, rend, orient)
 
     if orient == "-":
         cmd += " --reverse-complement"

@@ -119,8 +119,8 @@ workflow VIRALINTEGRATION {
         TRIMMOMATIC.out.trimmed_reads
     )
 
-    ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
-                file(params.viral_fasta, checkIfExists: true) ]
+    ch_viral_fasta = Channel.fromList([[ id:'viral_fasta', single_end:false ], // meta map
+                                       file(params.viral_fasta, checkIfExists: true)])
 
     CAT_FASTA (
         params.fasta,

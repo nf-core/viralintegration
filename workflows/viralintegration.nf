@@ -120,16 +120,9 @@ workflow VIRALINTEGRATION {
         TRIMMOMATIC.out.trimmed_reads
     )
 
-    viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
-                    file(params.viral_fasta, checkIfExists: true) ]
-
     CAT_FASTA (
         params.fasta,
         params.viral_fasta
-    )
-
-    SAMTOOLS_FAIDX (
-        viral_fasta
     )
 
     STAR_GENOMEGENERATE_PLUS (
@@ -181,23 +174,21 @@ workflow VIRALINTEGRATION {
     )
 
     // Join and pass fai and fasta pairs together //
-    ch_fasta = Channel.of([[ id:'fasta', single_end:false ], // meta map
-                           file(params.fasta, checkIfExists: true)])
-        .view()
+    ch_fasta = Channel.of([[ id:'genome_fasta', single_end:false ], // meta map
+                                 file(params.fasta, checkIfExists: true)])
 
     ch_viral_fasta = Channel.of([[ id:'viral_fasta', single_end:false ], // meta map
-                                 file(params.viral_fasta, checkIfExists: true)])
-        .view()
+                                       file(params.viral_fasta, checkIfExists: true)])
 
     ch_fasta.join(
         SAMTOOLS_FAIDX_HOST ( ch_fasta ).fai,
         by: [0], remainder: true)
         .set { ch_ref_fa_fai }
 
-    SAMTOOLS_FAIDX.out.fai
-        .join(ch_viral_fasta, by: [0], remainder: true)
+    ch_viral_fasta.join(
+        SAMTOOLS_FAIDX ( ch_viral_fasta ).fai,
+        by: [0], remainder: true)
         .set { ch_viral_fa_fai }
-
 
     EXTRACT_CHIMERIC_GENOMIC_TARGETS (
         ABRIDGED_TSV.out.filtered_abridged,

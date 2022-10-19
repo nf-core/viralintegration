@@ -180,11 +180,11 @@ workflow VIRALINTEGRATION {
     )
 
 // Join and pass fai and fasta pairs together //
-ch_fasta = Channel.fromList([[ id:'fasta', single_end:false ], // meta map
+ch_fasta = Channel.of([[ id:'fasta', single_end:false ], // meta map
                                     file(params.fasta, checkIfExists: true)])
     .view()
 
-ch_viral_fasta = Channel.fromList([[ id:'viral_fasta', single_end:false ], // meta map
+ch_viral_fasta = Channel.of([[ id:'viral_fasta', single_end:false ], // meta map
                                     file(params.viral_fasta, checkIfExists: true)])
     .view()
 

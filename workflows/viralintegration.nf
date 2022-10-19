@@ -58,6 +58,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
 include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
+include { SAMTOOLS_FAIDX as SAMTOOLS_FAIDX_HOST } from '../modules/nf-core/modules/samtools/faidx/main'
 include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
           STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/modules/star/genomegenerate/main'
 include { STAR_ALIGN as STAR_ALIGN_HOST
@@ -188,8 +189,9 @@ workflow VIRALINTEGRATION {
                                  file(params.viral_fasta, checkIfExists: true)])
         .view()
 
-    STAR_GENOMEGENERATE_HOST.out.index
-        .join(ch_fasta, by: [0], remainder: true)
+    ch_fasta.join(
+        SAMTOOLS_FAIDX_HOST ( ch_fasta ).fai,
+        by: [0], remainder: true)
         .set { ch_ref_fa_fai }
 
     SAMTOOLS_FAIDX.out.fai

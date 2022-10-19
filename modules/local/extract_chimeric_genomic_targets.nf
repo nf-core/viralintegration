@@ -23,7 +23,7 @@ process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
     def pad_region_length = '--pad_region_length 1000'
     """
     extract_chimeric_genomic_targets.py \\
-        --fasta ${fasta} \\
+        --fasta ${ref_genome_fasta} \\
         --patch_db_fasta ${viral_fasta} \\
         --output_prefix ${prefix} \\
         --chim_events ${insertion_site_candidates_abridged} \\

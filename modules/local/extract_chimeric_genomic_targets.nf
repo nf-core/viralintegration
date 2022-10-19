@@ -1,5 +1,5 @@
 process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
-    tag "$insertion_site_candidates_abridged"
+    tag "$meta.id"
 
     // TODO Use python 3.6.9 and pigz in their own container
     if (params.enable_conda) {
@@ -9,8 +9,8 @@ process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
 
     input:
     tuple val(meta), path(insertion_site_candidates_abridged)
-    path fasta
-    path viral_fasta
+    tuple val(meta), path(ref_genome_fasta), path(ref_genome_fai)
+    tuple val(meta), path(viral_fasta), path(viral_fai)
 
     output:
     tuple val(meta), path ("*.fasta")          , emit: fasta_extract
@@ -19,7 +19,7 @@ process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     // TODO Move to modules.config?
-    def prefix = task.ext.prefix ?: "${insertion_site_candidates_abridged}.vif.extract"
+    def prefix = task.ext.prefix ?: "${meta.id}.vif.extract"
     def pad_region_length = '--pad_region_length 1000'
     """
     extract_chimeric_genomic_targets.py \\

@@ -55,18 +55,18 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
-include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
-include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
-include { SAMTOOLS_FAIDX as SAMTOOLS_FAIDX_HOST } from '../modules/nf-core/modules/samtools/faidx/main'
+include { FASTQC                      } from '../modules/nf-core/fastqc/main'
+include { TRIMMOMATIC                 } from '../modules/nf-core/trimmomatic/main'
+include { SAMTOOLS_FAIDX              } from '../modules/nf-core/samtools/faidx/main'
+include { SAMTOOLS_FAIDX as SAMTOOLS_FAIDX_HOST } from '../modules/nf-core/samtools/faidx/main'
 include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
-          STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/modules/star/genomegenerate/main'
+          STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/star/genomegenerate/main'
 include { STAR_ALIGN as STAR_ALIGN_HOST
-          STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/modules/star/align/main'
-include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
-include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
-include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+          STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
+include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/samtools/index/main'
+include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

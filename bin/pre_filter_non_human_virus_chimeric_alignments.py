@@ -7,6 +7,7 @@ import logging
 from collections import defaultdict
 import pandas as pd
 import csv
+import gzip
 
 if sys.version_info[0] < 3:
     raise Exception("This script requires Python 3")
@@ -101,7 +102,11 @@ def main():
                 viral_db_entries.add(acc)
 
 
-    fh = open(chimJ_filename, "rt")
+    if os.path.splitext(chimJ_filename)[1] == ".gz":
+        fh = gzip.open(chimJ_filename, "rt")
+    else:
+        fh = open(chimJ_filename, "rt")
+
     reader = csv.DictReader(fh, delimiter="\t")
     fieldnames = list(reader.fieldnames)
 

@@ -63,8 +63,10 @@ include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
           STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/star/genomegenerate/main'
 include { STAR_ALIGN as STAR_ALIGN_HOST
           STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
-include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX              } from '../modules/nf-core/samtools/index/main'
+include { SAMTOOLS_SORT
+          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE} from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX
+          SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -205,6 +207,15 @@ workflow VIRALINTEGRATION {
         "illumina",
         false
     )
+
+    SAMTOOLS_SORT_VALIDATE (
+        STAR_ALIGN_VALIDATE.out.bam
+    )
+
+    SAMTOOLS_SORT_VALIDATE.out.bam.join(
+        SAMTOOLS_INDEX_VALIDATE ( SAMTOOLS_SORT_VALIDATE.out.bam ).bai,
+        by: [0], remainder: true)
+        .set { ch_validate_bam_bai }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

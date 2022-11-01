@@ -9,8 +9,8 @@ process EXTRACT_CHIMERIC_GENOMIC_TARGETS {
 
     input:
     tuple val(meta), path(insertion_site_candidates_abridged)
-    tuple val(meta), path(ref_genome_fasta), path(ref_genome_fai)
-    tuple val(meta), path(viral_fasta), path(viral_fai)
+    path(ref_genome_fasta)
+    path(viral_fasta)
 
     output:
     tuple val(meta), path ("*.fasta")          , emit: fasta_extract

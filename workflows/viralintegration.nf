@@ -38,6 +38,8 @@ include { CAT_FASTA } from '../modules/local/cat_fasta'
 include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
 include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 include { VIRUS_REPORT } from '../modules/local/virus_report'
+include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
+include { STAR_ALIGN_VALIDATE } from '../modules/local/star_align_validate'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -53,15 +55,18 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
-include { TRIMMOMATIC                 } from '../modules/nf-core/modules/trimmomatic/main'
-include { SAMTOOLS_FAIDX              } from '../modules/nf-core/modules/samtools/faidx/main'
-include { STAR_GENOMEGENERATE         } from '../modules/nf-core/modules/star/genomegenerate/main'
-include { STAR_ALIGN                  } from '../modules/nf-core/modules/star/align/main'
-include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
-include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
-include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { FASTQC                      } from '../modules/nf-core/fastqc/main'
+include { TRIMMOMATIC                 } from '../modules/nf-core/trimmomatic/main'
+include { SAMTOOLS_FAIDX              } from '../modules/nf-core/samtools/faidx/main'
+include { SAMTOOLS_FAIDX as SAMTOOLS_FAIDX_HOST } from '../modules/nf-core/samtools/faidx/main'
+include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
+          STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/star/genomegenerate/main'
+include { STAR_ALIGN as STAR_ALIGN_HOST
+          STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
+include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/samtools/index/main'
+include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,34 +97,42 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
-    TRIMMOMATIC (
-        INPUT_CHECK.out.reads
-    )
-
-    ch_viral_fasta = [ [ id:'viral_fasta', single_end:false ], // meta map
-                file(params.viral_fasta, checkIfExists: true) ]
-
-    CAT_FASTA (
+    STAR_GENOMEGENERATE_HOST (
         params.fasta,
-        params.viral_fasta
+        params.gtf
     )
 
-    SAMTOOLS_FAIDX (
-        ch_viral_fasta
+    // TODO Use igenomes
+    STAR_ALIGN_HOST (
+        INPUT_CHECK.out.reads,
+        STAR_GENOMEGENERATE_HOST.out.index,
+        params.gtf,
+        false,
+        "illumina",
+        false
+    )
+
+    TRIMMOMATIC (
+        STAR_ALIGN_HOST.out.fastq
     )
 
     POLYA_STRIPPER (
         TRIMMOMATIC.out.trimmed_reads
     )
 
-    STAR_GENOMEGENERATE (
+    CAT_FASTA (
+        params.fasta,
+        params.viral_fasta
+    )
+
+    STAR_GENOMEGENERATE_PLUS (
         CAT_FASTA.out.plus_fasta,
         params.gtf
     )
 
-    STAR_ALIGN (
+    STAR_ALIGN_PLUS (
         POLYA_STRIPPER.out.polya_trimmed,
-        STAR_GENOMEGENERATE.out.index,
+        STAR_GENOMEGENERATE_PLUS.out.index,
         params.gtf,
         false,
         "illumina",
@@ -127,7 +140,7 @@ workflow VIRALINTEGRATION {
     )
 
     SAMTOOLS_SORT (
-        STAR_ALIGN.out.bam
+        STAR_ALIGN_PLUS.out.bam
     )
 
     SAMTOOLS_INDEX (
@@ -136,7 +149,7 @@ workflow VIRALINTEGRATION {
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(STAR_ALIGN.out.junction)
+        .join(STAR_ALIGN_PLUS.out.junction)
         .set { ch_bam_bai_junction }
 
     INSERTION_SITE_CANDIDATES (
@@ -149,12 +162,48 @@ workflow VIRALINTEGRATION {
         INSERTION_SITE_CANDIDATES.out.full
     )
 
+    SAMTOOLS_SORT.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(ABRIDGED_TSV.out.filtered_abridged)
+        .set { ch_bam_bai_filtered }
+
     VIRUS_REPORT (
-        STAR_ALIGN.out.bam,
-        SAMTOOLS_INDEX.out.bai,
+        ch_bam_bai_filtered,
         params.viral_fasta,
-        ABRIDGED_TSV.out.filtered_abridged,
         ch_igvjs_VIF
+    )
+
+    // // Join and pass fai and fasta pairs together //
+    // ch_fasta = Channel.of([[ id:'genome_fasta', single_end:false ], // meta map
+    //                              file(params.fasta, checkIfExists: true)])
+
+    // ch_viral_fasta = Channel.of([[ id:'viral_fasta', single_end:false ], // meta map
+    //                                    file(params.viral_fasta, checkIfExists: true)])
+
+    // ch_fasta.join(
+    //     SAMTOOLS_FAIDX_HOST ( ch_fasta ).fai,
+    //     by: [0], remainder: true)
+    //     .set { ch_ref_fa_fai }
+
+    // ch_viral_fasta.join(
+    //     SAMTOOLS_FAIDX ( ch_viral_fasta ).fai,
+    //     by: [0], remainder: true)
+    //     .set { ch_viral_fa_fai }
+
+    EXTRACT_CHIMERIC_GENOMIC_TARGETS (
+        ABRIDGED_TSV.out.filtered_abridged,
+        params.fasta,
+        params.viral_fasta
+    )
+
+    STAR_ALIGN_HOST.out.fastq
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract)
+        .set { ch_unaligned_fastq_fasta }
+    STAR_ALIGN_VALIDATE (
+        ch_unaligned_fastq_fasta,
+        STAR_GENOMEGENERATE_PLUS.out.index,
+        "illumina",
+        false
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

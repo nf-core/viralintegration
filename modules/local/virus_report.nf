@@ -8,10 +8,8 @@ process VIRUS_REPORT {
     container "trinityctat/ctat_vif"
 
     input:
-    tuple val(meta), path(bam)
-    tuple val(meta), path(bai)
+    tuple val(meta), path(bam), path(bai), path(insertion_site_candidates)
     path viral_fasta
-    path insertion_site_candidates
     path igvjs_VIF
 
     output:

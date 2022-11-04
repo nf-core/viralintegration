@@ -41,6 +41,7 @@ include { VIRUS_REPORT } from '../modules/local/virus_report'
 include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
 include { STAR_ALIGN_VALIDATE } from '../modules/local/star_align_validate'
 include { CHIMERIC_CONTIG_EVIDENCE_ANALYZER } from '../modules/local/chimeric_contig_evidence_analyzer'
+include { SUMMARY_REPORT } from '../modules/local/summary_report'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -204,6 +205,22 @@ workflow VIRALINTEGRATION {
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
         ch_validate_bam_bai,
         EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract
+    )
+
+    CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
+        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0], remainder: true)
+        .set { ch_chimeric_bam_bai }
+
+    SUMMARY_REPORT(
+        ABRIDGED_TSV.out.filtered_abridged,
+        CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts,
+        ch_chimeric_bam_bai,
+        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract,
+        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract,
+        params.gtf,
+        VIRUS_REPORT.out.genome_abundance_plot,
+        VIRUS_REPORT.out.read_counts_image,
+        VIRUS_REPORT.out.read_counts_log_image
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

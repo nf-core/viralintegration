@@ -19,10 +19,6 @@ process CHIMERIC_CONTIG_EVIDENCE_ANALYZER {
     path ("insertions_validated.txt") , emit: txt
     path "versions.yml"                             , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-    gtf.size() > 0
-
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     // TODO Move to modules.config?
     def prefix = task.ext.prefix ?: "${meta.id}.vif"

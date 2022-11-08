@@ -63,7 +63,7 @@ process SUMMARY_REPORT {
         -o ${prefix}.refined.wRefGeneAnnots.tsv \\
         --gtf ${gtf}
 
-        if [[ -e ${prefix}.refined.wRefGeneAnnots.tsv ]]; then
+    if [[ -e ${prefix}.refined.wRefGeneAnnots.tsv ]]; then
 
         create_insertion_site_inspector_js.py \\
             --VIF_summary_tsv ${prefix}.refined.wRefGeneAnnots.tsv \\
@@ -75,10 +75,10 @@ process SUMMARY_REPORT {
             > ${prefix}.bed
 
         # prep for making the report
-        // # bamsifter \
-        // #   -c ${max_coverage} \
-        // #   -o ${prefix}.reads.bam \
-        // #   ${alignment_bam}
+        # bamsifter \\
+        #   -c ${max_coverage} \\
+        #   -o ${prefix}.reads.bam \\
+        #   ${alignment_bam}
 
         # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
         ln -sf ${chim_targets_fasta} ${prefix}.fa

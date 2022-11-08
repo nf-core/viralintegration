@@ -8,15 +8,17 @@ process SUMMARY_REPORT {
     container "trinityctat/ctat_vif"
 
     input:
-    tuple val(meta), path(init_counts)
-    tuple val(meta), path(vif_counts)
-    tuple val(meta), path(alignment_bam), path(alignment_bai)
-    tuple val(meta), path(chim_targets_gtf)
-    tuple val(meta), path(chim_targets_fasta)
+    tuple val(meta),
+        path(alignment_bam),
+        path(alignment_bai),
+        path(init_counts),
+        path(vif_counts),
+        path(chim_targets_gtf),
+        path(chim_targets_fasta),
+        path(genome_abundance_plot),
+        path(read_counts_image),
+        path(read_counts_log_image)
     path gtf
-    tuple val(meta), path(genome_abundance_plot)
-    tuple val(meta), path(read_counts_image)
-    tuple val(meta), path(read_counts_log_image)
 
     output:
     tuple val(meta), path ("*.html")                       , emit: html

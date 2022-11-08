@@ -208,19 +208,19 @@ workflow VIRALINTEGRATION {
     )
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
-        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0], remainder: true)
-        .set { ch_chimeric_bam_bai }
+        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0])
+        .join(ABRIDGED_TSV.out.filtered_abridged, by: [0])
+        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts, by: [0])
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract, by: [0])
+        .join(VIRUS_REPORT.out.genome_abundance_plot, by: [0])
+        .join(VIRUS_REPORT.out.read_counts_image, by: [0])
+        .join(VIRUS_REPORT.out.read_counts_log_image, by: [0])
+        .set { ch_summary_report }
 
     SUMMARY_REPORT(
-        ABRIDGED_TSV.out.filtered_abridged,
-        CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts,
-        ch_chimeric_bam_bai,
-        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract,
-        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract,
-        params.gtf,
-        VIRUS_REPORT.out.genome_abundance_plot,
-        VIRUS_REPORT.out.read_counts_image,
-        VIRUS_REPORT.out.read_counts_log_image
+        ch_summary_report,
+        params.gtf
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

@@ -200,11 +200,11 @@ workflow VIRALINTEGRATION {
     SAMTOOLS_SORT_VALIDATE.out.bam.join(
         SAMTOOLS_INDEX_VALIDATE ( SAMTOOLS_SORT_VALIDATE.out.bam ).bai,
         by: [0], remainder: true)
-        .set { ch_validate_bam_bai }
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .set { ch_validate_bam_bai_gtf }
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
-        ch_validate_bam_bai,
-        EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract
+        ch_validate_bam_bai_gtf
     )
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam

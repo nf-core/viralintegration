@@ -8,9 +8,7 @@ process CHIMERIC_CONTIG_EVIDENCE_ANALYZER {
     container "trinityctat/ctat_vif"
 
     input:
-    tuple val(meta), path(bam), path(bai)
-    tuple val(meta), path (gtf)
-
+    tuple val(meta), path(bam), path(bai), path(gtf)
 
     output:
     tuple val(meta), path ("*.evidence_counts.tsv") , emit: evidence_counts
@@ -18,6 +16,10 @@ process CHIMERIC_CONTIG_EVIDENCE_ANALYZER {
     tuple val(meta), path ("*.evidence.bam.bai")    , emit: evidence_bai
     path ("insertions_validated.txt") , emit: txt
     path "versions.yml"                             , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
+    gtf.size() > 0
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     // TODO Move to modules.config?

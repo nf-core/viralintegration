@@ -177,6 +177,9 @@ workflow VIRALINTEGRATION {
         ch_igvjs_VIF
     )
 
+    // TODO Handle insertion_site_candidates
+    // File insertion_site_candidates_use = select_first([insertion_site_candidates, InsertionSiteCandidates.filtered_abridged])
+
     EXTRACT_CHIMERIC_GENOMIC_TARGETS (
         ABRIDGED_TSV.out.filtered_abridged,
         params.fasta,

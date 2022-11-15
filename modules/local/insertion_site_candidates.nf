@@ -44,10 +44,16 @@ process INSERTION_SITE_CANDIDATES {
         --vif_full_tsv ${prefix}.tmp.full.tsv \\
         --output_bam ${prefix}.genome_chimeric_evidence.bam
 
+    # organize insertion candidates by virus chimeric breakends
+    greedily_assign_multimapping_reads_among_insertions.py \
+        --init_full_tsv ${prefix}.tmp.full.tsv \
+        --include_readnames \
+        > ${prefix}.tmp.full.virus_breakend_grouped.tsv
+
     # add evidence read stats
     incorporate_read_alignment_stats.py \\
         --supp_reads_bam ${prefix}.genome_chimeric_evidence.bam \\
-        --vif_full_tsv ${prefix}.tmp.full.tsv \\
+        --vif_full_tsv ${prefix}.tmp.full.virus_breakend_grouped.tsv \\
         --output ${prefix}.full.w_read_stats.tsv
 
     # add seq entropy around breakpoints
@@ -55,7 +61,12 @@ process INSERTION_SITE_CANDIDATES {
         --vif_tsv  ${prefix}.full.w_read_stats.tsv \\
         --ref_genome_fasta ${ref_genome_fasta} \\
         --viral_genome_fasta ${viral_fasta} \\
-        --output ${prefix}.full.tsv
+        --output ${prefix}.full.w_brkpt_seq_entropy.tsv
+
+    # identify additional primary targets to pursue (set is_primary='Maybe')
+    revise_primary_target_list_via_brkpt_homologies.py \
+        --vif_tsv ${prefix}.full.w_brkpt_seq_entropy.tsv \
+        > ${prefix}.full.tsv
 
     rm ${prefix}.tmp.full.tsv
 

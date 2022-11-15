@@ -19,6 +19,7 @@ process SUMMARY_REPORT {
         path(read_counts_image),
         path(read_counts_log_image)
     path gtf
+    path igvjs_VIF
 
     output:
     tuple val(meta), path ("*.html")                       , emit: html
@@ -84,7 +85,7 @@ process SUMMARY_REPORT {
         ln -sf ${chim_targets_fasta} ${prefix}.fa
 
         make_VIF_igvjs_html.py \\
-            --html_template igvjs_VIF.html \\
+            --html_template $igvjs_VIF \\
             --fusions_json igv.json \\
             --input_file_prefix ${prefix} \\
             --html_output ${prefix}.html

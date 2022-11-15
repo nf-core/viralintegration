@@ -223,7 +223,8 @@ workflow VIRALINTEGRATION {
 
     SUMMARY_REPORT(
         ch_summary_report,
-        params.gtf
+        params.gtf,
+        ch_igvjs_VIF
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

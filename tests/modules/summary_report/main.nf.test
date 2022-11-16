@@ -22,6 +22,8 @@ nextflow_process {
                     file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/test.VirusDetect.virus_read_counts_log.png', checkIfExists: true)
                 ]
                 input[1] = file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/GRCh38_chr18.gtf', checkIfExists: true)
+                // FIXME This could be local
+                input[2] = file("https://raw.githubusercontent.com/nf-core/viralintegration/b22f39078f4bf7b2ecd69e296f570124072982ae/assets/igvjs_VIF.html", checkIfExists: true)
                 """
             }
         }

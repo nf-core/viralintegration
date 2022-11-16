@@ -66,7 +66,7 @@ include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
 include { STAR_ALIGN as STAR_ALIGN_HOST
           STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
 include { SAMTOOLS_SORT
-          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE} from '../modules/nf-core/samtools/sort/main'
+          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE } from '../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX
           SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'

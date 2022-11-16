@@ -11,11 +11,11 @@ process CHIMERIC_CONTIG_EVIDENCE_ANALYZER {
     tuple val(meta), path(bam), path(bai), path(gtf)
 
     output:
-    tuple val(meta), path ("*.evidence_counts.tsv") , emit: evidence_counts
-    tuple val(meta), path ("*.evidence.bam")        , emit: evidence_bam
-    tuple val(meta), path ("*.evidence.bam.bai")    , emit: evidence_bai
-    path ("insertions_validated.txt") , emit: txt
-    path "versions.yml"                             , emit: versions
+    tuple val(meta), path ("*.evidence_counts.tsv")   , emit: evidence_counts
+    tuple val(meta), path ("*.evidence.bam")          , emit: evidence_bam
+    tuple val(meta), path ("*.evidence.bam.bai")      , emit: evidence_bai
+    tuple val(meta), path ("insertions_validated.txt"), emit: txt
+    path "versions.yml"                               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

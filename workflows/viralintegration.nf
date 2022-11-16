@@ -40,6 +40,8 @@ include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
 include { VIRUS_REPORT } from '../modules/local/virus_report'
 include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
 include { STAR_ALIGN_VALIDATE } from '../modules/local/star_align_validate'
+include { CHIMERIC_CONTIG_EVIDENCE_ANALYZER } from '../modules/local/chimeric_contig_evidence_analyzer'
+include { SUMMARY_REPORT } from '../modules/local/summary_report'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -63,8 +65,10 @@ include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
           STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/star/genomegenerate/main'
 include { STAR_ALIGN as STAR_ALIGN_HOST
           STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
-include { SAMTOOLS_SORT               } from '../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX              } from '../modules/nf-core/samtools/index/main'
+include { SAMTOOLS_SORT
+          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE } from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX
+          SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -173,22 +177,8 @@ workflow VIRALINTEGRATION {
         ch_igvjs_VIF
     )
 
-    // // Join and pass fai and fasta pairs together //
-    // ch_fasta = Channel.of([[ id:'genome_fasta', single_end:false ], // meta map
-    //                              file(params.fasta, checkIfExists: true)])
-
-    // ch_viral_fasta = Channel.of([[ id:'viral_fasta', single_end:false ], // meta map
-    //                                    file(params.viral_fasta, checkIfExists: true)])
-
-    // ch_fasta.join(
-    //     SAMTOOLS_FAIDX_HOST ( ch_fasta ).fai,
-    //     by: [0], remainder: true)
-    //     .set { ch_ref_fa_fai }
-
-    // ch_viral_fasta.join(
-    //     SAMTOOLS_FAIDX ( ch_viral_fasta ).fai,
-    //     by: [0], remainder: true)
-    //     .set { ch_viral_fa_fai }
+    // TODO Handle insertion_site_candidates
+    // File insertion_site_candidates_use = select_first([insertion_site_candidates, InsertionSiteCandidates.filtered_abridged])
 
     EXTRACT_CHIMERIC_GENOMIC_TARGETS (
         ABRIDGED_TSV.out.filtered_abridged,
@@ -204,6 +194,37 @@ workflow VIRALINTEGRATION {
         STAR_GENOMEGENERATE_PLUS.out.index,
         "illumina",
         false
+    )
+
+    SAMTOOLS_SORT_VALIDATE (
+        STAR_ALIGN_VALIDATE.out.bam
+    )
+
+    SAMTOOLS_SORT_VALIDATE.out.bam.join(
+        SAMTOOLS_INDEX_VALIDATE ( SAMTOOLS_SORT_VALIDATE.out.bam ).bai,
+        by: [0], remainder: true)
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .set { ch_validate_bam_bai_gtf }
+
+    CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
+        ch_validate_bam_bai_gtf
+    )
+
+    CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
+        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0])
+        .join(ABRIDGED_TSV.out.filtered_abridged, by: [0])
+        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts, by: [0])
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract, by: [0])
+        .join(VIRUS_REPORT.out.genome_abundance_plot, by: [0])
+        .join(VIRUS_REPORT.out.read_counts_image, by: [0])
+        .join(VIRUS_REPORT.out.read_counts_log_image, by: [0])
+        .set { ch_summary_report }
+
+    SUMMARY_REPORT(
+        ch_summary_report,
+        params.gtf,
+        ch_igvjs_VIF
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (

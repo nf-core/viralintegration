@@ -81,6 +81,8 @@ process SUMMARY_REPORT {
         #   -o ${prefix}.reads.bam \\
         #   ${alignment_bam}
 
+        cp ${alignment_bam} ${prefix}.reads.bam
+
         # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
         ln -sf ${chim_targets_fasta} ${prefix}.fa
 

@@ -68,7 +68,7 @@ process SUMMARY_REPORT {
 
         create_insertion_site_inspector_js.py \\
             --VIF_summary_tsv ${prefix}.refined.wRefGeneAnnots.tsv \\
-            --json_outfile igv.json
+            --json_outfile ${prefix}.igv.json
 
         # make bed for igvjs
         region_gtf_to_bed.py \\
@@ -86,7 +86,7 @@ process SUMMARY_REPORT {
 
         make_VIF_igvjs_html.py \\
             --html_template $igvjs_VIF \\
-            --fusions_json igv.json \\
+            --fusions_json ${prefix}.igv.json \\
             --input_file_prefix ${prefix} \\
             --html_output ${prefix}.html
 

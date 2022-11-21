@@ -1,5 +1,6 @@
 process ABRIDGED_TSV {
     tag "$meta.id"
+    label 'process_low'
 
     // TODO Use python 3.6.9 and pigz in their own container
     if (params.enable_conda) {

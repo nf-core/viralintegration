@@ -1,5 +1,6 @@
 process POLYA_STRIPPER {
     tag "$meta.id"
+    label 'process_medium'
 
     // TODO Use python 3.6.9 and pigz in their own container
     if (params.enable_conda) {

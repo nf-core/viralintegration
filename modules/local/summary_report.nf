@@ -96,7 +96,11 @@ process SUMMARY_REPORT {
             add_to_html.py \\
             --html ${prefix}.html \\
             --out ${prefix}.html \\
-            --image ${prefix}.genome_plot.png
+            --image ${prefix}.genome_plot.png \\
+            --image ${genome_abundance_plot} \\
+            --image ${read_counts_image} \\
+            --image ${read_counts_log_image}
+
     fi
 
     cat <<-END_VERSIONS > versions.yml

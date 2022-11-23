@@ -1,5 +1,6 @@
 process SUMMARY_REPORT {
     tag "$meta.id"
+    label 'process_medium'
 
     // TODO Use python 3.6.9 and pigz in their own container
     if (params.enable_conda) {
@@ -68,7 +69,7 @@ process SUMMARY_REPORT {
 
         create_insertion_site_inspector_js.py \\
             --VIF_summary_tsv ${prefix}.refined.wRefGeneAnnots.tsv \\
-            --json_outfile igv.json
+            --json_outfile ${prefix}.igv.json
 
         # make bed for igvjs
         region_gtf_to_bed.py \\
@@ -81,12 +82,14 @@ process SUMMARY_REPORT {
         #   -o ${prefix}.reads.bam \\
         #   ${alignment_bam}
 
+        cp ${alignment_bam} ${prefix}.reads.bam
+
         # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
         ln -sf ${chim_targets_fasta} ${prefix}.fa
 
         make_VIF_igvjs_html.py \\
             --html_template $igvjs_VIF \\
-            --fusions_json igv.json \\
+            --fusions_json ${prefix}.igv.json \\
             --input_file_prefix ${prefix} \\
             --html_output ${prefix}.html
 
@@ -94,7 +97,11 @@ process SUMMARY_REPORT {
             add_to_html.py \\
             --html ${prefix}.html \\
             --out ${prefix}.html \\
-            --image ${prefix}.genome_plot.png
+            --image ${prefix}.genome_plot.png \\
+            --image ${genome_abundance_plot} \\
+            --image ${read_counts_image} \\
+            --image ${read_counts_log_image}
+
     fi
 
     cat <<-END_VERSIONS > versions.yml

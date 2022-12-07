@@ -245,8 +245,7 @@ workflow VIRALINTEGRATION {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
     // ch_multiqc_files = ch_multiqc_files.mix(STAR_GENOMEGENERATE_HOST.out.log.collect{it[1]}.ifEmpty([])) //doesn't exist
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_HOST.out.log_final.collect{it[1]}.ifEmpty([]))
-    // ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.log.collect{it[1]}.ifEmpty([]))
-    // ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.trimmed_reads.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
     // ch_multiqc_files = ch_multiqc_files.mix(POLYA_STRIPPER.out.log.collect{it[1]}.ifEmpty([])) //doesn't exist
     // ch_multiqc_files = ch_multiqc_files.mix(STAR_GENOMEGENERATE_PLUS.out.log.collect{it[1]}.ifEmpty([])) //doesn't exist
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))

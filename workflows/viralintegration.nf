@@ -246,6 +246,7 @@ workflow VIRALINTEGRATION {
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_HOST.out.log_final.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
 
 
     MULTIQC (

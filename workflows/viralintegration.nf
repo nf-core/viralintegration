@@ -42,6 +42,7 @@ include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chim
 include { STAR_ALIGN_VALIDATE } from '../modules/local/star_align_validate'
 include { CHIMERIC_CONTIG_EVIDENCE_ANALYZER } from '../modules/local/chimeric_contig_evidence_analyzer'
 include { SUMMARY_REPORT } from '../modules/local/summary_report'
+include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -66,9 +67,11 @@ include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
 include { STAR_ALIGN as STAR_ALIGN_HOST
           STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
 include { SAMTOOLS_SORT
-          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE } from '../modules/nf-core/samtools/sort/main'
+          SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE
+          SAMTOOLS_SORT as SAMTOOLS_SORT_DUPLICATES } from '../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX
-          SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE } from '../modules/nf-core/samtools/index/main'
+          SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE
+          SAMTOOLS_INDEX as SAMTOOLS_INDEX_DUPLICATES } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -203,8 +206,31 @@ workflow VIRALINTEGRATION {
     SAMTOOLS_SORT_VALIDATE.out.bam.join(
         SAMTOOLS_INDEX_VALIDATE ( SAMTOOLS_SORT_VALIDATE.out.bam ).bai,
         by: [0], remainder: true)
+        .set { ch_validate_bam_bai }
+
+    REMOVE_DUPLICATES (
+        ch_validate_bam_bai
+    )
+
+    // Check if REMOVE_DUPLICATES.out.bam exists.
+    // if (remove duplicates exists, create + use duplicates channel) {
+
+    SAMTOOLS_SORT_DUPLICATES (
+        REMOVE_DUPLICATES.out.bam
+    )
+
+    SAMTOOLS_SORT_DUPLICATES.out.bam.join(
+        SAMTOOLS_INDEX_DUPLICATES ( SAMTOOLS_SORT_DUPLICATES.out.bam ).bai,
+        by: [0], remainder: true)
         .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
         .set { ch_validate_bam_bai_gtf }
+    }
+
+    // else use validate channel
+
+    // ch_validate_bam_bai.join(
+    //     EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+    //     .set { ch_validate_bam_bai_gtf }
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
         ch_validate_bam_bai_gtf

@@ -208,29 +208,19 @@ workflow VIRALINTEGRATION {
         by: [0], remainder: true)
         .set { ch_validate_bam_bai }
 
-    REMOVE_DUPLICATES (
-        ch_validate_bam_bai
-    )
 
+    ch_to_dupe_or_not = Channel.empty()
     // Check if REMOVE_DUPLICATES.out.bam exists.
-    // if (remove duplicates exists, create + use duplicates channel) {
-
-    SAMTOOLS_SORT_DUPLICATES (
-        REMOVE_DUPLICATES.out.bam
-    )
-
-    SAMTOOLS_SORT_DUPLICATES.out.bam.join(
-        SAMTOOLS_INDEX_DUPLICATES ( SAMTOOLS_SORT_DUPLICATES.out.bam ).bai,
-        by: [0], remainder: true)
-        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
-        .set { ch_validate_bam_bai_gtf }
+    if (!params.remove_duplicates) {
+        REMOVE_DUPLICATES ( ch_validate_bam_bai )
+        ch_to_dupe_or_not = REMOVE_DUPLICATES.out.bam_bai
+    } else {
+        ch_to_dupe_or_not = ch_validate_bam_bai
     }
 
-    // else use validate channel
-
-    // ch_validate_bam_bai.join(
-    //     EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
-    //     .set { ch_validate_bam_bai_gtf }
+    ch_to_dupe_or_not
+        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .set { ch_validate_bam_bai_gtf }
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
         ch_validate_bam_bai_gtf

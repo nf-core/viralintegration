@@ -12,15 +12,18 @@ process REMOVE_DUPLICATES {
     tuple val(meta), path(input_bam), path(input_bai)
 
     output:
-    tuple val(meta), path ("*.bam"), optional:true, emit: bam
-    path "versions.yml"            , emit: versions
+    tuple val(meta), path("*.bam"), path("*.bai"), emit: bam_bai
+    path "versions.yml"           , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/viralintegration/bin/
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     bam_mark_duplicates.py \
         -i ${input_bam} \
-        -o ${prefix}.bam
+        -o ${prefix}.dedup.bam \
+        -r
+
+    samtools index ${prefix}.dedup.bam
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

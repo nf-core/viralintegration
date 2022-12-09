@@ -1,0 +1,46 @@
+nextflow_process {
+
+    name "Test Process SUMMARY_REPORT"
+    script "modules/local/summary_report.nf"
+    process "SUMMARY_REPORT"
+
+    test("Should run without failures") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.evidence.bam', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.evidence.bam.bai', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.init.filtered.abridged.tsv', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.evidence_counts.tsv', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.extract.gtf', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.vif.extract.fasta', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.VirusDetect.init.genome_plot.png', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.VirusDetect.virus_read_counts.png', checkIfExists: true),
+                    file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/summary_report/nextflow_run_v1_4_scripts/test.VirusDetect.virus_read_counts_log.png', checkIfExists: true)
+                ]
+                input[1] = file('https://raw.githubusercontent.com/nf-core/test-datasets/viralintegration/testdata/GRCh38_chr18.gtf', checkIfExists: true)
+                // FIXME This could be local
+                input[2] = file("https://raw.githubusercontent.com/nf-core/viralintegration/b22f39078f4bf7b2ecd69e296f570124072982ae/assets/igvjs_VIF.html", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+
+            assert process.success
+            // assert process.trace.tasks().size() == 2
+
+            // with(process.out.trial_out_ch) {
+            //     assert size() == 2
+            //     assert path(get(0)).readLines().size() == 1
+            //     assert path(get(1)).readLines().size() == 1
+            //     assert path(get(1)).md5 == "4a17df7a54b41a84df492da3f1bab1e3"
+            // }
+
+        }
+
+    }
+}

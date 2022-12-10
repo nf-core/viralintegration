@@ -51,9 +51,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument(
-        "--chimJ", type=str, required=True, help="STAR Chimeric.out.junction file"
-    )
+    parser.add_argument("--chimJ", type=str, required=True, help="STAR Chimeric.out.junction file")
 
     parser.add_argument(
         "--viral_db_fasta",
@@ -97,12 +95,11 @@ def main():
     parser.add_argument(
         "--max_multi_read_alignments",
         type=int,
-        default=1, # unique chimeric read alignments
-        help='max number of multimaps for chimeric read alignments to be considered as evidence (1=unique only)')
+        default=1,  # unique chimeric read alignments
+        help="max number of multimaps for chimeric read alignments to be considered as evidence (1=unique only)",
+    )
 
-
-    parser.add_argument("--debug", action='store_true', help='debug mode')
-
+    parser.add_argument("--debug", action="store_true", help="debug mode")
 
     ###########################
     # Parse input arguments
@@ -115,7 +112,6 @@ def main():
     viral_aggregation_dist = args_parsed.viral_genome_aggregation_dist
     output_prefix = args_parsed.output_prefix
     max_multi_read_alignments = args_parsed.max_multi_read_alignments
-
 
     if args_parsed.debug:
         logger.setLevel(logging.DEBUG)
@@ -154,102 +150,149 @@ def main():
 
     duplicate_read_catcher = set()
 
-
     # Read in the junction file
-    df = pd.read_csv(chimJ_filename, sep = "\t")
+    df = pd.read_csv(chimJ_filename, sep="\t")
 
-
-    #~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~
     # multimapping reads
-    #~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~
     # - under defaults, we discard multimapping reads
 
     logger.info("## Mulitimapping reads")
     logger.info("-max multi read alignments allowed: {}".format(max_multi_read_alignments))
 
-    hitcounts = df.groupby('read_name').size().to_dict()
-    df['hitcount'] = df['read_name'].map(hitcounts)
-
+    hitcounts = df.groupby("read_name").size().to_dict()
+    df["hitcount"] = df["read_name"].map(hitcounts)
 
     logger.info(f"-chim alignments before applying max multi setting: {df.shape[0]}")
     # Filter by multimapping
-    df = df[df['hitcount'] <= max_multi_read_alignments]
+    df = df[df["hitcount"] <= max_multi_read_alignments]
     logger.info(f"-chim alignments AFTER applying max multi setting: {df.shape[0]}")
 
-
     # Convert the junction types
-    df["junction_type"].replace({-1: "Span",
-                             0: "Split",
-                             1: "Split",  # GT/AG",
-                             2: "Split",}, inplace=True)
+    df["junction_type"].replace(
+        {
+            -1: "Span",
+            0: "Split",
+            1: "Split",  # GT/AG",
+            2: "Split",
+        },
+        inplace=True,
+    )
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~
     # Check to see if chrA or chrB are in viral data base
-    #~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~
     logger.info("-filtering out human--human chimeric entries")
     df = df[(df["chr_donorA"].isin(viral_db_entries)) ^ (df["chr_acceptorB"].isin(viral_db_entries))]
 
     logger.info(f"Chimeric insertions involving viruses and human: {df.shape[0]}")
 
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~
     ## reorient so host (human) genome is always in the + reference orientation.
-    #~~~~~~~~~~~~~~~~~~~~~~~~~
-    idx = ((df["chr_donorA"].isin(viral_db_entries)) & (df["strand_acceptorB"] == "-") | (df["chr_acceptorB"].isin(viral_db_entries) & (df["strand_donorA"] == "-")))
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~
+    idx = (df["chr_donorA"].isin(viral_db_entries)) & (df["strand_acceptorB"] == "-") | (
+        df["chr_acceptorB"].isin(viral_db_entries) & (df["strand_donorA"] == "-")
+    )
 
-
-    df.loc[idx, ['chr_donorA', 'brkpt_donorA', 'strand_donorA', 'repeat_left_lenA', 'start_alnA', 'cigar_alnA',
-                 'chr_acceptorB','brkpt_acceptorB', 'strand_acceptorB', 'repeat_right_lenB', 'start_alnB', 'cigar_alnB']
-           ] = df.loc[idx,['chr_acceptorB','brkpt_acceptorB', 'strand_acceptorB', 'repeat_right_lenB', 'start_alnB', 'cigar_alnB',
-                           'chr_donorA', 'brkpt_donorA', 'strand_donorA', 'repeat_left_lenA', 'start_alnA', 'cigar_alnA']].values
+    df.loc[
+        idx,
+        [
+            "chr_donorA",
+            "brkpt_donorA",
+            "strand_donorA",
+            "repeat_left_lenA",
+            "start_alnA",
+            "cigar_alnA",
+            "chr_acceptorB",
+            "brkpt_acceptorB",
+            "strand_acceptorB",
+            "repeat_right_lenB",
+            "start_alnB",
+            "cigar_alnB",
+        ],
+    ] = df.loc[
+        idx,
+        [
+            "chr_acceptorB",
+            "brkpt_acceptorB",
+            "strand_acceptorB",
+            "repeat_right_lenB",
+            "start_alnB",
+            "cigar_alnB",
+            "chr_donorA",
+            "brkpt_donorA",
+            "strand_donorA",
+            "repeat_left_lenA",
+            "start_alnA",
+            "cigar_alnA",
+        ],
+    ].values
 
     # adjust the orientation
-    df.loc[idx,['strand_donorA','strand_acceptorB']] = df.loc[idx,['strand_donorA','strand_acceptorB']].replace({"+":"-","-":"+"})
-
-
+    df.loc[idx, ["strand_donorA", "strand_acceptorB"]] = df.loc[idx, ["strand_donorA", "strand_acceptorB"]].replace(
+        {"+": "-", "-": "+"}
+    )
 
     if remove_duplicates_flag:
 
         logger.info("## Duplicate read alignments")
-        #~~~~~~~~~~~~~~~~~~~~~~~~~
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~
         # Duplicates
-        #~~~~~~~~~~~~~~~~~~~~~~~~~
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~
         # Add duplicated annotations
         # identify duplicated read names as well as duplicated insertions
         # duplicate insertions
 
         logger.info(f"Chimeric alignments before filter duplicates: {df.shape[0]}")
 
-        df["Duplicate"] = df[['chr_donorA', 'start_alnA', 'brkpt_donorA', 'strand_donorA', 'cigar_alnA',
-                              'chr_acceptorB','start_alnB', 'brkpt_acceptorB', 'strand_acceptorB', 'cigar_alnB']].duplicated(keep="first")
+        df["Duplicate"] = df[
+            [
+                "chr_donorA",
+                "start_alnA",
+                "brkpt_donorA",
+                "strand_donorA",
+                "cigar_alnA",
+                "chr_acceptorB",
+                "start_alnB",
+                "brkpt_acceptorB",
+                "strand_acceptorB",
+                "cigar_alnB",
+            ]
+        ].duplicated(keep="first")
 
-        df = df[ df["Duplicate"] == False ]
+        df = df[df["Duplicate"] == False]
 
         logger.info(f"Chimeric alignments AFTER filter duplicates: {df.shape[0]}")
-
 
     # Run through each line in the chimeric junctions file
     for idx, row in df.iterrows():
         # print(idx, row)
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Create Dictionary holding read objects for each genome-virus pairing
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Output the chimeric read line as an object
-        chim_read = Chimeric_read(  row.chr_donorA,
-                                    row.brkpt_donorA,
-                                    row.strand_donorA,
-                                    row.chr_acceptorB,
-                                    row.brkpt_acceptorB,
-                                    row.strand_acceptorB,
-                                    row.junction_type,
-                                    row.read_name)
+        chim_read = Chimeric_read(
+            row.chr_donorA,
+            row.brkpt_donorA,
+            row.strand_donorA,
+            row.chr_acceptorB,
+            row.brkpt_acceptorB,
+            row.strand_acceptorB,
+            row.junction_type,
+            row.read_name,
+        )
         # Creating Genome-Virus pairings
         # dictionary KEY
-        genome_pair = "^".join([row.chr_donorA, row.chr_acceptorB,])
+        genome_pair = "^".join(
+            [
+                row.chr_donorA,
+                row.chr_acceptorB,
+            ]
+        )
         # Add the chimeric read lines to a dictionary with key as the Chrom-Virus grouping
         ## dictionary holds all chromosome virus groupings
         genome_pair_to_evidence[genome_pair].add(chim_read)
-
 
     #########################################
     # Gather all Chimeric events
@@ -265,16 +308,16 @@ def main():
 
         logger.debug("Genome pair: " + genome_pair)
 
-        chim_events = group_chim_reads_into_events(chim_reads, viral_db_entries, human_aggregation_dist, viral_aggregation_dist)
+        chim_events = group_chim_reads_into_events(
+            chim_reads, viral_db_entries, human_aggregation_dist, viral_aggregation_dist
+        )
 
         # //TODO: can try to link up events into paired insertion points for single events.
 
         all_chim_events.extend(chim_events)
 
     ## prioritize by total read support.
-    all_chim_events = sorted(
-        all_chim_events, key=lambda x: x.get_read_support()[2], reverse=True
-    )
+    all_chim_events = sorted(all_chim_events, key=lambda x: x.get_read_support()[2], reverse=True)
 
     ## #####################
     ## generate final report.
@@ -348,16 +391,10 @@ def main():
 
                 chim_event.refine_insertion_coordinates()
 
-                print(
-                    chim_event.get_event_accession() + "\t" + str(chim_event), file=ofh
-                )
+                print(chim_event.get_event_accession() + "\t" + str(chim_event), file=ofh)
                 supporting_reads = chim_event.get_readnames()
                 print(
-                    chim_event.get_event_accession()
-                    + "\t"
-                    + str(chim_event)
-                    + "\t"
-                    + ",".join(supporting_reads),
+                    chim_event.get_event_accession() + "\t" + str(chim_event) + "\t" + ",".join(supporting_reads),
                     file=ofh_full,
                 )
 
@@ -383,7 +420,7 @@ def main():
 
 
 def group_chim_reads_into_events(chim_reads_list, viral_db_entries, human_aggregation_dist, viral_aggregation_dist):
-    '''
+    """
     Function to groups all chimeric events.
         if chimeric events occur in the same orientation and within a specific distance
         they will be combined
@@ -394,7 +431,7 @@ def group_chim_reads_into_events(chim_reads_list, viral_db_entries, human_aggreg
     Returns;
     : chim_events : a list of the chimertic events
     what are top event reads?
-    '''
+    """
 
     chim_events = list()
 
@@ -409,7 +446,9 @@ def group_chim_reads_into_events(chim_reads_list, viral_db_entries, human_aggreg
         # IF this chimeric event is the same orientation and within a specified distance from another event
         #   combine the event with the existing event in the chim_events list
         # IF NOT, add the new event to the chim_events list
-        if not supplements_existing_event(chim_event, chim_events, viral_db_entries, human_aggregation_dist, viral_aggregation_dist):
+        if not supplements_existing_event(
+            chim_event, chim_events, viral_db_entries, human_aggregation_dist, viral_aggregation_dist
+        ):
             # add new event to chim_events list
             chim_events.append(chim_event)
             logger.debug("-logging chimeric event: " + str(chim_event))
@@ -417,13 +456,18 @@ def group_chim_reads_into_events(chim_reads_list, viral_db_entries, human_aggreg
     return chim_events
 
 
-def supplements_existing_event(chim_event, chim_events_list, viral_db_entries, human_aggregation_dist, viral_aggregation_dist):
-    '''
+def supplements_existing_event(
+    chim_event, chim_events_list, viral_db_entries, human_aggregation_dist, viral_aggregation_dist
+):
+    """
     Function to check if the current chimeric read/event can be combined with an existing event
-    '''
+    """
 
-    (agg_dist_A, agg_dist_B) = (human_aggregation_dist, viral_aggregation_dist) if chim_event.chrB in viral_db_entries else (viral_aggregation_dist, human_aggregation_dist)
-
+    (agg_dist_A, agg_dist_B) = (
+        (human_aggregation_dist, viral_aggregation_dist)
+        if chim_event.chrB in viral_db_entries
+        else (viral_aggregation_dist, human_aggregation_dist)
+    )
 
     # Loop over stored Chimeric events
     for prev_chim_event in chim_events_list:
@@ -432,7 +476,6 @@ def supplements_existing_event(chim_event, chim_events_list, viral_db_entries, h
         # if the read falls within the given distance from each other
         # then combine them
 
-
         if (
             chim_event.orientA == prev_chim_event.orientA
             and abs(chim_event.coordA - prev_chim_event.coordA) <= agg_dist_A
@@ -440,11 +483,7 @@ def supplements_existing_event(chim_event, chim_events_list, viral_db_entries, h
             and abs(chim_event.coordB - prev_chim_event.coordB) <= agg_dist_B
         ):
 
-            logger.debug(
-                "-adding {} as supplement to {}".format(
-                    str(chim_event), str(prev_chim_event)
-                )
-            )
+            logger.debug("-adding {} as supplement to {}".format(str(chim_event), str(prev_chim_event)))
             # append this chimeric event to the previous
             prev_chim_event.absorb_nearby_chim_event(chim_event)
 
@@ -499,12 +538,11 @@ def gather_top_event_reads(reads_list):
 
 
 class Chimeric_read:
-    '''
+    """
     Object that parses the read
-    '''
-    def __init__(
-        self, chrA, coordA, orientA, chrB, coordB, orientB, splitType, readname=None
-    ):
+    """
+
+    def __init__(self, chrA, coordA, orientA, chrB, coordB, orientB, splitType, readname=None):
         self.chrA = chrA
         self.coordA = coordA
         self.orientA = orientA
@@ -530,9 +568,10 @@ class Chimeric_read:
 
 
 class Chimeric_event(Chimeric_read):
-    '''
+    """
     Object
-    '''
+    """
+
     def __init__(self, chimeric_reads_list):
         self.chimeric_reads_list = chimeric_reads_list
 
@@ -565,7 +604,6 @@ class Chimeric_event(Chimeric_read):
 
         return num_chimeric_reads, num_absorbed_reads, num_total_reads
 
-
     def refine_insertion_coordinates(self):
         if self._refined:
             raise RuntimeError("chimeric event already refined, can only do this once")
@@ -585,11 +623,10 @@ class Chimeric_event(Chimeric_read):
             coordA_vals.append(chim_event.coordA)
             coordB_vals.append(chim_event.coordB)
 
-        self.coordA = max(coordA_vals) if self.orientA == '+' else min(coordA_vals)
-        self.coordB = min(coordB_vals) if self.orientB == '+' else max(coordB_vals)
+        self.coordA = max(coordA_vals) if self.orientA == "+" else min(coordA_vals)
+        self.coordB = min(coordB_vals) if self.orientB == "+" else max(coordB_vals)
 
         return
-
 
     def __repr__(self):
         (
@@ -598,9 +635,7 @@ class Chimeric_event(Chimeric_read):
             num_total_reads,
         ) = self.get_read_support()
 
-        return super().__repr__() + "\t{}\t{}\t{}".format(
-            num_chimeric_reads, num_absorbed_reads, num_total_reads
-        )
+        return super().__repr__() + "\t{}\t{}\t{}".format(num_chimeric_reads, num_absorbed_reads, num_total_reads)
 
     def get_coordstring(self):
         return super().__repr__()

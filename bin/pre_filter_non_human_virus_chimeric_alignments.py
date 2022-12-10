@@ -53,9 +53,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument(
-        "--chimJ", type=str, required=True, help="STAR Chimeric.out.junction file"
-    )
+    parser.add_argument("--chimJ", type=str, required=True, help="STAR Chimeric.out.junction file")
 
     parser.add_argument(
         "--viral_db_fasta",
@@ -72,8 +70,7 @@ def main():
         required=True,
         help="output filename",
     )
-    parser.add_argument("--debug", action='store_true', help='debug mode')
-
+    parser.add_argument("--debug", action="store_true", help="debug mode")
 
     ###########################
     # Parse input arguments
@@ -87,7 +84,6 @@ def main():
     if args_parsed.debug:
         logger.setLevel(logging.DEBUG)
 
-
     ###########################
     ## get list of viral_db entries. (Viruses names found in fasta file)
     ###########################
@@ -100,7 +96,6 @@ def main():
             if m:
                 acc = m.group(1)
                 viral_db_entries.add(acc)
-
 
     if os.path.splitext(chimJ_filename)[1] == ".gz":
         fh = gzip.open(chimJ_filename, "rt")
@@ -122,7 +117,7 @@ def main():
 
     for row in reader:
 
-        read_name = row['read_name']
+        read_name = row["read_name"]
         if read_name != prev_read_name:
             if not prev_nonrelevant_chim:
                 count_virus_chims += 1
@@ -134,10 +129,10 @@ def main():
 
             prev_read_name = read_name
 
-        chr_donorA_is_virus = row['chr_donorA'] in viral_db_entries
-        chr_donorB_is_virus = row['chr_acceptorB'] in viral_db_entries
+        chr_donorA_is_virus = row["chr_donorA"] in viral_db_entries
+        chr_donorB_is_virus = row["chr_acceptorB"] in viral_db_entries
 
-        if (chr_donorA_is_virus ^ chr_donorB_is_virus) and "chrM" not in (row['chr_donorA'], row['chr_acceptorB']):
+        if (chr_donorA_is_virus ^ chr_donorB_is_virus) and "chrM" not in (row["chr_donorA"], row["chr_acceptorB"]):
             reads_collected.append(row)
 
         else:
@@ -150,12 +145,10 @@ def main():
         for read in reads_collected:
             writer.writerow(read)
 
-
     logger.info(f"Extracted {count_virus_chims} human/virus chimeric reads")
 
     fh.close()
     ofh.close()
-
 
     sys.exit(0)
 

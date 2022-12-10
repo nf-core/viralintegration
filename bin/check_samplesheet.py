@@ -158,7 +158,7 @@ def sniff_format(handle):
     peek = read_head(handle)
     handle.seek(0)
     sniffer = csv.Sniffer()
-    
+
     # FIXME https://github.com/nf-core/tools/issues/1539
     # if not sniffer.has_header(peek):
     #     logger.critical("The given sample sheet does not appear to contain a header.")

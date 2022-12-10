@@ -24,7 +24,10 @@ arguments.add_argument(
 )
 
 arguments.add_argument(
-    "--json_outfile", required=True, type=str, help="The output json file to create",
+    "--json_outfile",
+    required=True,
+    type=str,
+    help="The output json file to create",
 )
 
 
@@ -39,18 +42,18 @@ dict_json = {}
 dict_json["fusions"] = []
 
 vif_info_tokens = [
-        "contig",
-        "chrA",
-        "coordA",
-        "orientA",
-        "chrB",
-        "coordB",
-        "orientB",
-        "split",
-        "span",
-        "total",
-        "upstream",
-        "downstream"
+    "contig",
+    "chrA",
+    "coordA",
+    "orientA",
+    "chrB",
+    "coordB",
+    "orientB",
+    "split",
+    "span",
+    "total",
+    "upstream",
+    "downstream",
 ]
 
 # Make fusion detail

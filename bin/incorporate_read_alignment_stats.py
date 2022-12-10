@@ -12,18 +12,20 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
 def main():
 
-    parser = argparse.ArgumentParser(description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     parser.add_argument("--supp_reads_bam", required=True, type=str, help="supplemental read alignments")
     parser.add_argument("--vif_full_tsv", required=True, type=str, help="VIF full tsv containing evidence read names")
     parser.add_argument("--output", required=True, type=str, help="output tsv file containing read alignment stats")
-    parser.add_argument("--detailed", action='store_true', help='show attribute values for each read instead of mean statistic')
+    parser.add_argument(
+        "--detailed", action="store_true", help="show attribute values for each read instead of mean statistic"
+    )
 
     args = parser.parse_args()
-
 
     bam_filename = args.supp_reads_bam
     vif_full_tsv = args.vif_full_tsv
@@ -33,17 +35,14 @@ def main():
 
     ev_reads = set()
 
-
     logger.info("-capturing reads of interest from {}".format(vif_full_tsv))
     vif_df = pd.read_csv(vif_full_tsv, sep="\t")
     for _, row in vif_df.iterrows():
-        readnames = row['readnames'].split(",")
+        readnames = row["readnames"].split(",")
         for readname in readnames:
             ev_reads.add(readname)
 
-
     logger.info("-capturing read alignment stats from bam file: {}".format(bam_filename))
-
 
     read_to_hit_count = defaultdict(int)
     read_to_min_per_id = dict()
@@ -60,7 +59,7 @@ def main():
 
         read_counter += 1
 
-        if (read_counter % 10000 == 0):
+        if read_counter % 10000 == 0:
             logger.info("-processed {} alignments".format(read_counter))
 
         aligned_bases = len(read.get_aligned_pairs(matches_only=True))
@@ -69,12 +68,11 @@ def main():
         else:
             read_to_min_anchor_len[read_name] = aligned_bases
 
-
-        NH = read.get_tag('NH')
+        NH = read.get_tag("NH")
         read_to_hit_count[read_name] = max(read_to_hit_count[read_name], NH)
 
-        mismatch_count = read.get_tag('NM')
-        per_id = 100.0 - ( float(mismatch_count) / aligned_bases * 100.0)
+        mismatch_count = read.get_tag("NM")
+        per_id = 100.0 - (float(mismatch_count) / aligned_bases * 100.0)
 
         if read_name in read_to_min_per_id:
             read_to_min_per_id[read_name] = min(read_to_min_per_id[read_name], per_id)
@@ -84,7 +82,7 @@ def main():
         cigar = read.cigarstring
 
         max_clip = 0
-        m =  re.search("^(\d+)S", cigar)
+        m = re.search("^(\d+)S", cigar)
         if m:
             max_clip = int(m.group(1))
 
@@ -94,10 +92,6 @@ def main():
 
         read_to_max_end_clipping[read_name] = max(read_to_max_end_clipping[read_name], max_clip)
 
-
-
-
-
     logger.info("-generating alignment stats report")
 
     vif_df["hits"] = ""
@@ -106,7 +100,7 @@ def main():
     vif_df["min_anchor_len"] = ""
 
     for i, row in vif_df.iterrows():
-        readnames = row['readnames'].split(",")
+        readnames = row["readnames"].split(",")
         hits = list()
         min_per_ids = list()
         max_end_clipping = list()
@@ -123,18 +117,18 @@ def main():
             min_anchor_lengths.append(read_to_min_anchor_len[readname])
 
         if args.detailed:
-            vif_df.loc[i, 'hits'] = ",".join([str(x) for x in hits])
-            vif_df.loc[i, 'min_per_id'] = ",".join(["{:.1f}".format(x) for x in min_per_ids])
-            vif_df.loc[i, 'max_end_clipping'] = ",".join([str(x) for x in max_end_clipping])
-            vif_df.loc[i, 'min_anchor_len'] = ",".join([str(x) for x in min_anchor_lengths])
+            vif_df.loc[i, "hits"] = ",".join([str(x) for x in hits])
+            vif_df.loc[i, "min_per_id"] = ",".join(["{:.1f}".format(x) for x in min_per_ids])
+            vif_df.loc[i, "max_end_clipping"] = ",".join([str(x) for x in max_end_clipping])
+            vif_df.loc[i, "min_anchor_len"] = ",".join([str(x) for x in min_anchor_lengths])
 
         else:
-            vif_df.loc[i, 'hits'] = "{:.3f}".format(st.mean(hits))
-            vif_df.loc[i, 'min_per_id'] = "{:.1f}".format(st.mean(min_per_ids))
-            vif_df.loc[i, 'max_end_clipping'] = "{:.3f}".format(st.mean(max_end_clipping))
-            vif_df.loc[i, 'min_anchor_len'] = "{:.3f}".format(st.mean(min_anchor_lengths))
+            vif_df.loc[i, "hits"] = "{:.3f}".format(st.mean(hits))
+            vif_df.loc[i, "min_per_id"] = "{:.1f}".format(st.mean(min_per_ids))
+            vif_df.loc[i, "max_end_clipping"] = "{:.3f}".format(st.mean(max_end_clipping))
+            vif_df.loc[i, "min_anchor_len"] = "{:.3f}".format(st.mean(min_anchor_lengths))
 
-    #vif_df.drop('readnames', axis=1, inplace=True)
+    # vif_df.drop('readnames', axis=1, inplace=True)
 
     logger.info("-writing outputfile: {}".format(outputfilename))
     vif_df.to_csv(outputfilename, sep="\t", index=False)
@@ -144,6 +138,5 @@ def main():
     sys.exit(0)
 
 
-
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

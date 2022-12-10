@@ -6,25 +6,32 @@ import logging
 import argparse
 import pysam
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s : %(levelname)s : %(message)s',
-                    datefmt='%H:%M:%S')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s : %(levelname)s : %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)
+
 
 def main():
 
-    parser = argparse.ArgumentParser(description="mark duplicates in bam", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description="mark duplicates in bam", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
-    parser.add_argument("--input_bam", "-i", dest="input_bam", required=True, type=str,
-                        help="input bam file, coordinate sorted")
+    parser.add_argument(
+        "--input_bam", "-i", dest="input_bam", required=True, type=str, help="input bam file, coordinate sorted"
+    )
 
-    parser.add_argument("--output_bam", "-o", dest="output_bam", required=True, type=str,
-                        help="output bam file")
+    parser.add_argument("--output_bam", "-o", dest="output_bam", required=True, type=str, help="output bam file")
 
-    parser.add_argument("--remove_dups", "-r", dest='remove_dups', action='store_true', default=False,
-                        help='instead of marking duplicates, just remove them')
+    parser.add_argument(
+        "--remove_dups",
+        "-r",
+        dest="remove_dups",
+        action="store_true",
+        default=False,
+        help="instead of marking duplicates, just remove them",
+    )
 
-    parser.add_argument("--debug", "-d", dest='debug', action='store_true', default=False, help="debug mode")
+    parser.add_argument("--debug", "-d", dest="debug", action="store_true", default=False, help="debug mode")
 
     args = parser.parse_args()
 
@@ -35,17 +42,12 @@ def main():
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-
-
     bamreader = pysam.AlignmentFile(input_bam_filename, "rb")
 
-    if ( ( (not 'SO' in bamreader.header.as_dict()['HD']) )
-        or
-        bamreader.header.as_dict()['HD']['SO'] != 'coordinate') :
+    if ((not "SO" in bamreader.header.as_dict()["HD"])) or bamreader.header.as_dict()["HD"]["SO"] != "coordinate":
         raise RuntimeError("Error, file: {} must be coordinate sorted".format(input_bam_filename))
 
-    bamwriter =  pysam.AlignmentFile(output_bam_filename, "wb", template=bamreader)
-
+    bamwriter = pysam.AlignmentFile(output_bam_filename, "wb", template=bamreader)
 
     # KISS: just use the read and mate starting points
 
@@ -64,7 +66,6 @@ def main():
         queued_duplicate_reads.clear()
         prev_start = -1
         prev_chrom = None
-
 
     duplicate_counter = 0
 
@@ -104,7 +105,6 @@ def main():
             current_pos_mate_coords.add(mate_start)
             logger.debug("-not a duplicate here")
 
-
         # output read alignment.
         if duplicate_flag:
             read.is_duplicate = True
@@ -121,13 +121,10 @@ def main():
         prev_chrom = chrom
         prev_start = start
 
-
-
-
     logger.info("Done. Marked {} duplicates".format(duplicate_counter))
 
     sys.exit(0)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

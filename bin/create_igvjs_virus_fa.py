@@ -15,12 +15,12 @@ if os.path.exists(output_virus_fa):
     exit("Error, output file {} already exists.  Remove or relocate it before proceeding".format(output_virus_fa))
 
 
-sp.check_call("touch {}".format(output_virus_fa), shell=True) # just in case, avoid missing outfile if no virus
+sp.check_call("touch {}".format(output_virus_fa), shell=True)  # just in case, avoid missing outfile if no virus
 
-df = pd.read_csv(virus_igvjs_bed, sep="\t", names=['virus', 'start', 'end'])
+df = pd.read_csv(virus_igvjs_bed, sep="\t", names=["virus", "start", "end"])
 for _, row in df.iterrows():
-    virus_acc = row['virus']
-    cmd = "samtools faidx {} \"{}\" >> {}".format(input_virus_fa, virus_acc, output_virus_fa)
+    virus_acc = row["virus"]
+    cmd = 'samtools faidx {} "{}" >> {}'.format(input_virus_fa, virus_acc, output_virus_fa)
     print(cmd, file=sys.stderr)
     sp.check_call(cmd, shell=True)
 

@@ -6,19 +6,20 @@ from collections import defaultdict
 import argparse
 
 
-
 def main():
 
+    parser = argparse.ArgumentParser(
+        description="assign Maybe status to top entries of breakpoint homology groups",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
-    parser = argparse.ArgumentParser(description="assign Maybe status to top entries of breakpoint homology groups", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument("--vif_tsv", type=str, default="", required=True, help="intial (preliminary phase 1) insertion predictions")
+    parser.add_argument(
+        "--vif_tsv", type=str, default="", required=True, help="intial (preliminary phase 1) insertion predictions"
+    )
 
     args = parser.parse_args()
 
     vif_tsv = args.vif_tsv
-
-
 
     # begin work
     csv.field_size_limit(sys.maxsize)
@@ -56,16 +57,15 @@ def main():
     rows = list()
     rows_grouped_by_virus_brkpt = defaultdict(list)
     for row in tab_reader:
-        row['total'] = int(row['total'])
+        row["total"] = int(row["total"])
         rows.append(row)
-        virus, brkpt = (row['chrA'], row['coordA']) if re.match("chr[\dMXY]+$", row['chrB']) else (row['chrB'], row['coordB'])
-        virus_brkpt_token = ":".join([virus, brkpt, row['flankA'], row['flankB'] ])
+        virus, brkpt = (
+            (row["chrA"], row["coordA"]) if re.match("chr[\dMXY]+$", row["chrB"]) else (row["chrB"], row["coordB"])
+        )
+        virus_brkpt_token = ":".join([virus, brkpt, row["flankA"], row["flankB"]])
         rows_grouped_by_virus_brkpt[virus_brkpt_token].append(row)
 
-
-    rows = sorted(rows, key = lambda x: (x['total'], x['entry']), reverse=True)
-
-
+    rows = sorted(rows, key=lambda x: (x["total"], x["entry"]), reverse=True)
 
     fieldnames = list(tab_reader.fieldnames)
     writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames, delimiter="\t")
@@ -75,28 +75,29 @@ def main():
     ev_reads_seen = set()
 
     for row in rows:
-        virus, brkpt = (row['chrA'], row['coordA']) if re.match("chr[\dMXY]+$", row['chrB']) else (row['chrB'], row['coordB'])
-        virus_brkpt_token = ":".join([virus, brkpt, row['flankA'], row['flankB'] ])
+        virus, brkpt = (
+            (row["chrA"], row["coordA"]) if re.match("chr[\dMXY]+$", row["chrB"]) else (row["chrB"], row["coordB"])
+        )
+        virus_brkpt_token = ":".join([virus, brkpt, row["flankA"], row["flankB"]])
 
         if virus_brkpt_token in processed_brkpts:
             continue
 
         shared_virus_brkpt_rows = rows_grouped_by_virus_brkpt[virus_brkpt_token]
 
-        shared_virus_brkpt_rows = sorted(shared_virus_brkpt_rows, key=lambda x: x['adj_total'], reverse=True)
+        shared_virus_brkpt_rows = sorted(shared_virus_brkpt_rows, key=lambda x: x["adj_total"], reverse=True)
 
-        if shared_virus_brkpt_rows[0]['is_primary'] == "False":
+        if shared_virus_brkpt_rows[0]["is_primary"] == "False":
             # pursue it as an alt candidate
-            shared_virus_brkpt_rows[0]['is_primary'] = "Maybe"
+            shared_virus_brkpt_rows[0]["is_primary"] = "Maybe"
 
         # report entries
         for loc_row in shared_virus_brkpt_rows:
 
             writer.writerow(loc_row)
 
-
         processed_brkpts.add(virus_brkpt_token)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

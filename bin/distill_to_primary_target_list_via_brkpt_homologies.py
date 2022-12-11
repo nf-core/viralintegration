@@ -6,19 +6,24 @@ from collections import defaultdict
 import argparse
 
 
-
 def main():
 
+    parser = argparse.ArgumentParser(
+        description="assign Maybe status to top entries of breakpoint homology groups",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
-    parser = argparse.ArgumentParser(description="assign Maybe status to top entries of breakpoint homology groups", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument("--vif_tsv", type=str, default="", required=True, help="final prediction list including primary and non-primary entries")
+    parser.add_argument(
+        "--vif_tsv",
+        type=str,
+        default="",
+        required=True,
+        help="final prediction list including primary and non-primary entries",
+    )
 
     args = parser.parse_args()
 
     vif_tsv = args.vif_tsv
-
-
 
     # begin work
     csv.field_size_limit(sys.maxsize)
@@ -56,9 +61,8 @@ def main():
     rows_grouped_by_virus_brkpt = defaultdict(list)
 
     for row in tab_reader:
-        virus_brkpt_token = ":".join([row['virus_brkend_grp'], row['flankA'], row['flankB'] ])
+        virus_brkpt_token = ":".join([row["virus_brkend_grp"], row["flankA"], row["flankB"]])
         rows_grouped_by_virus_brkpt[virus_brkpt_token].append(row)
-
 
     final_rows = list()
 
@@ -69,32 +73,29 @@ def main():
         nonprimary_info = list()
 
         for row in rows:
-            if row['is_primary'] != "False":
+            if row["is_primary"] != "False":
                 primary_row = row
             else:
-                nonprimary_info.append(":".join([row['contig'], row['prelim.adj_total'] ]))
+                nonprimary_info.append(":".join([row["contig"], row["prelim.adj_total"]]))
 
         assert primary_row is not None, "couldn't locate primary insertion entry for {}".format(virus_brkpt_token)
 
-        primary_row['num_alt_locs'] = len(nonprimary_info)
-        primary_row['alt_locs'] = ",".join(nonprimary_info)
+        primary_row["num_alt_locs"] = len(nonprimary_info)
+        primary_row["alt_locs"] = ",".join(nonprimary_info)
 
         final_rows.append(primary_row)
 
+    final_rows = sorted(final_rows, key=lambda x: x["total"], reverse=True)
 
-    final_rows = sorted(final_rows, key=lambda x: x['total'], reverse=True)
-
-
-    fieldnames = list(tab_reader.fieldnames) + ['num_alt_locs', 'alt_locs']
-    fieldnames.remove('is_primary')
+    fieldnames = list(tab_reader.fieldnames) + ["num_alt_locs", "alt_locs"]
+    fieldnames.remove("is_primary")
     writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames, delimiter="\t")
     writer.writeheader()
 
-
     for row in final_rows:
-        del row['is_primary']
+        del row["is_primary"]
         writer.writerow(row)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

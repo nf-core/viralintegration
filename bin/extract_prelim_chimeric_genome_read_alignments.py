@@ -13,17 +13,19 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
 def main():
 
-    parser = argparse.ArgumentParser(description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     parser.add_argument("--star_bam", required=True, type=str, help="STAR read alignments to genome+virus db")
     parser.add_argument("--vif_full_tsv", required=True, type=str, help="VIF full tsv containing evidence read names")
-    parser.add_argument("--output_bam", required=True, type=str, help="output bam containing just the chimeric read alignments")
+    parser.add_argument(
+        "--output_bam", required=True, type=str, help="output bam containing just the chimeric read alignments"
+    )
 
     args = parser.parse_args()
-
 
     bam_filename = args.star_bam
     vif_full_tsv = args.vif_full_tsv
@@ -40,10 +42,9 @@ def main():
     logger.info("-capturing reads of interest from {}".format(vif_full_tsv))
     vif_df = pd.read_csv(vif_full_tsv, sep="\t")
     for _, row in vif_df.iterrows():
-        readnames = row['readnames'].split(",")
+        readnames = row["readnames"].split(",")
         for readname in readnames:
             ev_reads.add(readname)
-
 
     logger.info("-capturing read alignments from {}, writing to: {}".format(bam_filename, output_bam_filename))
 
@@ -57,7 +58,7 @@ def main():
 
         read_counter += 1
 
-        if (read_counter % 100 == 0):
+        if read_counter % 100 == 0:
             logger.info("-captured {} chimeric alignments".format(read_counter))
 
         bam_outfile.write(read)
@@ -65,11 +66,10 @@ def main():
         if read_name in not_seen:
             not_seen.remove(read_name)
 
-
-
-
     if not_seen:
-        raise RuntimeError("Error, missing alignments for {} chimeric reads: {}".format(len(not_seen), ",".join(list(not_seen))))
+        raise RuntimeError(
+            "Error, missing alignments for {} chimeric reads: {}".format(len(not_seen), ",".join(list(not_seen)))
+        )
 
     bam_outfile.close()
     samfile.close()
@@ -81,6 +81,5 @@ def main():
     sys.exit(0)
 
 
-
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

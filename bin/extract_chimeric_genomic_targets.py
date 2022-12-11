@@ -32,9 +32,7 @@ def main():
         help="Reference genome fasta",
     )
 
-    arg_parser.add_argument(
-        "--patch_db_fasta", type=str, required=True, help="patch genome database"
-    )
+    arg_parser.add_argument("--patch_db_fasta", type=str, required=True, help="patch genome database")
 
     arg_parser.add_argument(
         "--output_prefix",
@@ -69,8 +67,6 @@ def main():
         logger.error("Error {} not found".format(ref_genome_fasta))
         sys.exit(1)
 
-
-
     event_info_dict = parse_chim_events(chim_events_filename)
 
     write_genome_target_regions(
@@ -84,9 +80,7 @@ def main():
     sys.exit(0)
 
 
-def write_genome_target_regions(
-    event_info_dict, ref_genome_fasta, patch_db_fasta, output_prefix, pad_region_length
-):
+def write_genome_target_regions(event_info_dict, ref_genome_fasta, patch_db_fasta, output_prefix, pad_region_length):
 
     patch_db_entries = set()
     with open(patch_db_fasta, "rt") as fh:
@@ -119,9 +113,7 @@ def write_genome_target_regions(
         brkpt_type = event["primary_brkpt_type"]
 
         chrA_fasta_file, chrB_fasta_file = (
-            (ref_genome_fasta, patch_db_fasta)
-            if chrB in patch_db_entries
-            else (patch_db_fasta, ref_genome_fasta)
+            (ref_genome_fasta, patch_db_fasta) if chrB in patch_db_entries else (patch_db_fasta, ref_genome_fasta)
         )
 
         chrA_lend = coordA - pad_region_length
@@ -136,9 +128,7 @@ def write_genome_target_regions(
             else:
                 chrA_lend = coordA
 
-        chrA_seq_region = extract_seq_region(
-            chrA_fasta_file, chrA, chrA_lend, chrA_rend, orientA
-        )
+        chrA_seq_region = extract_seq_region(chrA_fasta_file, chrA, chrA_lend, chrA_rend, orientA)
 
         chrB_lend = coordB - pad_region_length
         chrB_rend = coordB + pad_region_length
@@ -151,9 +141,7 @@ def write_genome_target_regions(
             else:
                 chrB_rend = coordB
 
-        chrB_seq_region = extract_seq_region(
-            chrB_fasta_file, chrB, chrB_lend, chrB_rend, orientB
-        )
+        chrB_seq_region = extract_seq_region(chrB_fasta_file, chrB, chrB_lend, chrB_rend, orientB)
 
         # build target sequence and gtf
         concat_seq = chrA_seq_region
@@ -213,9 +201,7 @@ def extract_seq_region(fasta_filename, chr, lend, rend, orient):
     if orient == "-":
         cmd += " --reverse-complement"
 
-    result = "".join(
-        subprocess.check_output(cmd, shell=True, encoding="utf-8").split("\n")[1:]
-    )
+    result = "".join(subprocess.check_output(cmd, shell=True, encoding="utf-8").split("\n")[1:])
 
     return result
 

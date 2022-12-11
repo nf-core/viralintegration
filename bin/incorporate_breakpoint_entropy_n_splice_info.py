@@ -14,17 +14,16 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
 def main():
 
-    parser = argparse.ArgumentParser(description="add breakpoint entropy stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
+    parser = argparse.ArgumentParser(
+        description="add breakpoint entropy stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     parser.add_argument("--vif_tsv", required=True, type=str, help="VIF full tsv containing evidence read names")
     parser.add_argument("--ref_genome_fasta", required=True, type=str, help="ref genome fasta file")
-    parser.add_argument("--viral_genome_fasta", required=True, type=str, help='viral genome fasta file')
+    parser.add_argument("--viral_genome_fasta", required=True, type=str, help="viral genome fasta file")
     parser.add_argument("--output", required=True, type=str, help="output tsv file containing additional entropy stats")
-
 
     args = parser.parse_args()
 
@@ -33,8 +32,6 @@ def main():
     viral_genome_fasta_filename = args.viral_genome_fasta
     output_filename = args.output
 
-
-
     vif_df = pd.read_csv(vif_tsv_filename, sep="\t")
     print(vif_df.head())
 
@@ -42,8 +39,6 @@ def main():
         logger.info("-no candidates to pursue")
         subprocess.check_call(f"cp {vif_tsv_filename} {output_filename}", shell=True)
         sys.exit(0)
-
-
 
     ref_genome_fai_filename = ref_genome_fasta_filename + ".fai"
     if not os.path.exists(ref_genome_fai_filename):
@@ -55,45 +50,42 @@ def main():
 
     virus_accs = set(pd.read_csv(viral_genome_fai_filename, sep="\t", header=None)[0].tolist())
 
-
-
-
     flank_len = 30
-    def get_breakpoint_flanking_seq (acc, coord, orient, left_or_right_side):
+
+    def get_breakpoint_flanking_seq(acc, coord, orient, left_or_right_side):
 
         # coord represents donor or acceptor site position
         # so need to adjust for sequence extraction based on left/right and orientation info.
 
         if left_or_right_side == "left":
-            if orient == '+':
-                anchor_left = coord -1 - flank_len + 1
-                anchor_right = coord -1  +2
-            elif orient == '-':
-                anchor_left = coord + 1 -2
+            if orient == "+":
+                anchor_left = coord - 1 - flank_len + 1
+                anchor_right = coord - 1 + 2
+            elif orient == "-":
+                anchor_left = coord + 1 - 2
                 anchor_right = coord + 1 + flank_len - 1
 
             else:
                 raise RuntimeError(f"cannot recognize orient {orient}")
 
         elif left_or_right_side == "right":
-            if orient == '+':
-                anchor_left = coord + 1 -2
-                anchor_right = coord + 1 + flank_len -1
-            elif orient == '-':
-                anchor_left = coord -1 - flank_len + 1
-                anchor_right = coord -1 +2
+            if orient == "+":
+                anchor_left = coord + 1 - 2
+                anchor_right = coord + 1 + flank_len - 1
+            elif orient == "-":
+                anchor_left = coord - 1 - flank_len + 1
+                anchor_right = coord - 1 + 2
             else:
                 raise RuntimeError(f"cannot recognize orient {orient}")
         else:
             raise RuntimeError(f"cannot recognize left_or_right_side {left_or_right_side}")
-
 
         if acc in virus_accs:
             seq_region = extract_seqrange(acc, viral_genome_fasta_filename, anchor_left, anchor_right)
         else:
             seq_region = extract_seqrange(acc, ref_genome_fasta_filename, anchor_left, anchor_right)
 
-        if orient == '-':
+        if orient == "-":
             seq_region = revcomp(seq_region)
 
         seq_region = list(seq_region.lower())
@@ -109,20 +101,21 @@ def main():
 
         return seq_region
 
-
-    vif_df["flankA"] = vif_df.apply(lambda row: get_breakpoint_flanking_seq(row['chrA'], row['coordA'], row['orientA'], 'left'), axis=1)
-    vif_df["flankB"] = vif_df.apply(lambda row: get_breakpoint_flanking_seq(row['chrB'], row['coordB'], row['orientB'], 'right'), axis=1)
+    vif_df["flankA"] = vif_df.apply(
+        lambda row: get_breakpoint_flanking_seq(row["chrA"], row["coordA"], row["orientA"], "left"), axis=1
+    )
+    vif_df["flankB"] = vif_df.apply(
+        lambda row: get_breakpoint_flanking_seq(row["chrB"], row["coordB"], row["orientB"], "right"), axis=1
+    )
 
     vif_df["entropyA"] = vif_df["flankA"].apply(lambda x: compute_entropy(x, "left"))
     vif_df["entropyB"] = vif_df["flankB"].apply(lambda x: compute_entropy(x, "right"))
 
     # simplify formatting.
-    vif_df["entropyA"]  = vif_df["entropyA"].apply(lambda x: "{:.3f}".format(x) )
-    vif_df["entropyB"]  = vif_df["entropyB"].apply(lambda x: "{:.3f}".format(x) )
+    vif_df["entropyA"] = vif_df["entropyA"].apply(lambda x: "{:.3f}".format(x))
+    vif_df["entropyB"] = vif_df["entropyB"].apply(lambda x: "{:.3f}".format(x))
 
-
-    vif_df["splice_type"] = vif_df.apply(lambda row: get_splice_info(row['flankA'], row['flankB']), axis=1)
-
+    vif_df["splice_type"] = vif_df.apply(lambda row: get_splice_info(row["flankA"], row["flankB"]), axis=1)
 
     logger.info("-writing outputfile: {}".format(output_filename))
     vif_df.to_csv(output_filename, sep="\t", index=False)
@@ -164,30 +157,20 @@ def compute_entropy(seq_txt, left_or_right):
     entropy = 0.0
     for char, count in char_counter.items():
         p = count / num_chars
-        entropy += p * math.log2(1/p)
+        entropy += p * math.log2(1 / p)
 
     return entropy
 
 
+revcomp_translation = {"G": "C", "g": "c", "C": "G", "c": "g", "A": "T", "a": "t", "T": "A", "t": "a"}
 
-revcomp_translation = { 'G' : 'C',
-                        'g' : 'c',
-
-                        'C' : 'G',
-                        'c' : 'g',
-
-                        'A' : 'T',
-                        'a' : 't',
-
-                        'T' : 'A',
-                        't' : 'a' }
 
 def revcomp(sequence):
 
     sequence = list(sequence)
-    sequence = sequence[::-1] # rev it
+    sequence = sequence[::-1]  # rev it
 
-    sequence = [ revcomp_translation[x] if x in revcomp_translation else x for x in sequence]
+    sequence = [revcomp_translation[x] if x in revcomp_translation else x for x in sequence]
 
     sequence = "".join(sequence)
 
@@ -210,7 +193,7 @@ def get_splice_info(flankA, flankB):
         if rev_splice_candidate in splice_signals:
             return rev_splice_candidate
 
-    return "." # just a placeholder to indicate no canonical splice signal identified.
+    return "."  # just a placeholder to indicate no canonical splice signal identified.
 
 
 def run_cmd(cmd):
@@ -219,6 +202,5 @@ def run_cmd(cmd):
     return
 
 
-
-if __name__=='__main__':
+if __name__ == "__main__":
     main()

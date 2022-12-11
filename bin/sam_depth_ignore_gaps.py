@@ -4,6 +4,7 @@ import sys, os, re
 import pysam
 from collections import defaultdict
 
+
 def main():
 
     usage = "\n\n\tusage: {} filename.bam (or - for stdin)\n\n".format(sys.argv[0])
@@ -18,7 +19,6 @@ def main():
 
     samfile = pysam.AlignmentFile(input_bam_file, "rb")
 
-
     seqarray = defaultdict(int)
     prev_chrom = None
 
@@ -29,7 +29,6 @@ def main():
             # reinit
             prev_chrom = chrom
             seqarray = defaultdict(int)
-
 
         alignment_blocks = read.get_blocks()
         for alignment_block in alignment_blocks:
@@ -45,10 +44,11 @@ def main():
 def dump_coverage(chrom, seqarray):
     positions = sorted(list([int(i) for i in seqarray.keys()]))
     for pos in positions:
-        cov = seqarray[ str(pos) ]
+        cov = seqarray[str(pos)]
         print(f"{chrom}\t{pos}\t{cov}")
 
     return
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     main()

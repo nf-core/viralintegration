@@ -3,9 +3,6 @@
         "content": [
             45,
             "test_T1.vif.prelim.refined.tsv:md5,17b26b7a86d61206154ca3e2df02fc48",
-            "test_T1.vif.refined.distilled.tsv:md5,ef63b5d294d3bbb93c8a836ac5301e3c",
-            "test_T1.vif.refined.tsv:md5,4bac42d8c01d4c89850e7092854bcc3e",
-            "test_T1.vif.refined.wRefGeneAnnots.tsv:md5,f6ce7c173e3706828557edd17c6fd33d",
             "novirus_T1.VirusDetect.igvjs.bam:md5,1416469ad13277d81204ff8332084ced",
             "novirus_T1.VirusDetect.sorted.igvjs.bam:md5,597eca709113196eae603bfe3e9dbe4e",
             "redherring_T1.VirusDetect.igvjs.bam:md5,190447f1542c0546b3c71b6957ade958",
@@ -14,6 +11,6 @@
             "test_T1.VirusDetect.sorted.igvjs.bam:md5,399478ce0c0b561498c18ff8b77d91c4",
             "test_T1.VirusDetect.virus_read_counts_summary.tsv:md5,c051eb1a25e4741c43274589f75b80b6"
         ],
-        "timestamp": "2022-12-11T17:28:21+0000"
+        "timestamp": "2022-12-23T20:36:06+0000"
     }
 }

@@ -200,15 +200,16 @@ def fastq_iterator(fastq_filename):
 
     have_records = True
     while have_records:
-        readname = next(fh).rstrip()
-        readseq = next(fh).rstrip()
-        L3 = next(fh).rstrip()
-        quals = next(fh).rstrip()
+        try:
+            readname = next(fh).rstrip()
+            readseq = next(fh).rstrip()
+            L3 = next(fh).rstrip()
+            quals = next(fh).rstrip()
 
-        yield (readname, readseq, L3, quals)
+            yield (readname, readseq, L3, quals)
 
-        if not readname:
-            break
+        except StopIteration:
+            have_records = False
 
     return
 

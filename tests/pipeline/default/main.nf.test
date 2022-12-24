@@ -1,0 +1,55 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert snapshot(
+                workflow.trace.tasks().size(),
+
+                path("$outputDir/summary/test_T1.vif.prelim.refined.tsv"),
+                // FIXME md5sum fails on CI
+                // path("$outputDir/summary/test_T1.vif.refined.distilled.tsv"),
+                // path("$outputDir/summary/test_T1.vif.refined.tsv"),
+                // path("$outputDir/summary/test_T1.vif.refined.wRefGeneAnnots.tsv"),
+
+                path("$outputDir/virus/novirus_T1.VirusDetect.igvjs.bam"),
+                path("$outputDir/virus/novirus_T1.VirusDetect.sorted.igvjs.bam"),
+                path("$outputDir/virus/redherring_T1.VirusDetect.igvjs.bam"),
+                path("$outputDir/virus/redherring_T1.VirusDetect.sorted.igvjs.bam"),
+                path("$outputDir/virus/test_T1.VirusDetect.igvjs.bam"),
+                path("$outputDir/virus/test_T1.VirusDetect.sorted.igvjs.bam"),
+                path("$outputDir/virus/test_T1.VirusDetect.virus_read_counts_summary.tsv"),
+            ).match()
+
+            assert new File("$outputDir/summary/test_T1.vif.refined.distilled.tsv").exists()
+            assert new File("$outputDir/summary/test_T1.vif.refined.tsv").exists()
+            assert new File("$outputDir/summary/test_T1.vif.refined.wRefGeneAnnots.tsv").exists()
+
+            assert new File("$outputDir/summary/test_T1.vif.genome_plot.png").exists()
+            assert new File("$outputDir/summary/test_T1.vif.html").exists()
+
+            assert new File("$outputDir/virus/novirus_T1.VirusDetect.init.genome_plot.png").exists()
+            assert new File("$outputDir/virus/novirus_T1.VirusDetect.virus_read_counts.png").exists()
+            assert new File("$outputDir/virus/novirus_T1.VirusDetect.virus_read_counts_log.png").exists()
+            assert new File("$outputDir/virus/redherring_T1.VirusDetect.init.genome_plot.png").exists()
+            assert new File("$outputDir/virus/redherring_T1.VirusDetect.virus_read_counts.png").exists()
+            assert new File("$outputDir/virus/redherring_T1.VirusDetect.virus_read_counts_log.png").exists()
+            assert new File("$outputDir/virus/test_T1.VirusDetect.igvjs.html").exists()
+            assert new File("$outputDir/virus/test_T1.VirusDetect.init.genome_plot.png").exists()
+            assert new File("$outputDir/virus/test_T1.VirusDetect.virus_read_counts.png").exists()
+            assert new File("$outputDir/virus/test_T1.VirusDetect.virus_read_counts_log.png").exists()
+        }
+
+    }
+
+}

@@ -169,7 +169,6 @@ class NfcoreTemplate {
     // e.g. Microsoft Teams and Slack
     //
     public static void IM_notification(workflow, params, summary_params, projectDir, log) {
-
         def hook_url = params.hook_url
 
         def summary = [:]

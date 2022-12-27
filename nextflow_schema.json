@@ -44,6 +44,16 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "min_reads": {
+                    "type": "integer",
+                    "default": "5",
+                    "description": "Minimum reads"
+                },
+                "max_hits": {
+                    "type": "integer",
+                    "default": "50",
+                    "description": "Maximum hits"
                 }
             }
         },

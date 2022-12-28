@@ -152,6 +152,7 @@ def main():
 
     # Read in the junction file
     df = pd.read_csv(chimJ_filename, sep="\t")
+    df = df.astype({"read_name": "str"})  # in case they look like integers.
 
     # ~~~~~~~~~~~~~~~~~~~
     # multimapping reads
@@ -261,6 +262,8 @@ def main():
             ]
         ].duplicated(keep="first")
 
+        # df.to_csv("dups_marked.tsv", sep="\t")
+
         df = df[df["Duplicate"] == False]
 
         logger.info(f"Chimeric alignments AFTER filter duplicates: {df.shape[0]}")
@@ -317,7 +320,7 @@ def main():
         all_chim_events.extend(chim_events)
 
     ## prioritize by total read support.
-    all_chim_events = sorted(all_chim_events, key=lambda x: x.get_read_support()[2], reverse=True)
+    all_chim_events = sorted(all_chim_events, key=lambda x: (x.get_read_support()[2], str(x)), reverse=True)
 
     ## #####################
     ## generate final report.
@@ -394,7 +397,11 @@ def main():
                 print(chim_event.get_event_accession() + "\t" + str(chim_event), file=ofh)
                 supporting_reads = chim_event.get_readnames()
                 print(
-                    chim_event.get_event_accession() + "\t" + str(chim_event) + "\t" + ",".join(supporting_reads),
+                    chim_event.get_event_accession()
+                    + "\t"
+                    + str(chim_event)
+                    + "\t"
+                    + ",".join(sorted(supporting_reads)),
                     file=ofh_full,
                 )
 
@@ -516,7 +523,7 @@ def gather_top_event_reads(reads_list):
     #   Puts split first
     sorted_brkpts = sorted(
         brkpt_counter.keys(),
-        key=lambda x: (priority[brkpt_type[x]], brkpt_counter[x]),
+        key=lambda x: (priority[brkpt_type[x]], brkpt_counter[x], str(x)),
         reverse=True,
     )
 

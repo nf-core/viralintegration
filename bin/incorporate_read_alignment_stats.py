@@ -37,6 +37,7 @@ def main():
 
     logger.info("-capturing reads of interest from {}".format(vif_full_tsv))
     vif_df = pd.read_csv(vif_full_tsv, sep="\t")
+    vif_df = vif_df.astype({"readnames": "str"})  # in case they look like integers
     for _, row in vif_df.iterrows():
         readnames = row["readnames"].split(",")
         for readname in readnames:

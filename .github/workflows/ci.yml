@@ -38,6 +38,7 @@ jobs:
           path: |
             /usr/local/bin/nextflow
             /usr/local/bin/nf-test
+            /home/runner/.nf-test/nf-test.jar
           key: viralintegration-${{ runner.os }}-${{ matrix.NXF_VER }}
 
       - name: Install Nextflow

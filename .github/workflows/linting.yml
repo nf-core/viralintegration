@@ -41,6 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Check code lints with Black
         uses: psf/black@stable
 
@@ -76,7 +77,6 @@ jobs:
         uses: nf-core/setup-nextflow@v1
 
       - uses: actions/setup-python@v4
-
         with:
           python-version: "3.7"
           architecture: "x64"

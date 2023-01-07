@@ -42,7 +42,6 @@ jobs:
           key: viralintegration-${{ runner.os }}-${{ matrix.NXF_VER }}
 
       - name: Install Nextflow
-        if: steps.cache-software.outputs.cache-hit != 'true'
         uses: nf-core/setup-nextflow@v1
         with:
           version: "${{ matrix.NXF_VER }}"

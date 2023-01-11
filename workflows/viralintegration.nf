@@ -109,6 +109,7 @@ workflow VIRALINTEGRATION {
         params.fasta,
         params.gtf
     )
+    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE_HOST.out.versions)
 
     // TODO Use igenomes
     STAR_ALIGN_HOST (
@@ -119,24 +120,29 @@ workflow VIRALINTEGRATION {
         "illumina",
         false
     )
+    ch_versions = ch_versions.mix(STAR_ALIGN_HOST.out.versions.first())
 
     TRIMMOMATIC (
         STAR_ALIGN_HOST.out.fastq
     )
+    ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions.first())
 
     POLYA_STRIPPER (
         TRIMMOMATIC.out.trimmed_reads
     )
+    ch_versions = ch_versions.mix(POLYA_STRIPPER.out.versions.first())
 
     CAT_FASTA (
         params.fasta,
         params.viral_fasta
     )
+    ch_versions = ch_versions.mix(CAT_FASTA.out.versions)
 
     STAR_GENOMEGENERATE_PLUS (
         CAT_FASTA.out.plus_fasta,
         params.gtf
     )
+    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE_PLUS.out.versions)
 
     STAR_ALIGN_PLUS (
         POLYA_STRIPPER.out.polya_trimmed,
@@ -146,14 +152,17 @@ workflow VIRALINTEGRATION {
         "illumina",
         false
     )
+    ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
 
     SAMTOOLS_SORT (
         STAR_ALIGN_PLUS.out.bam
     )
+    ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
 
     SAMTOOLS_INDEX (
         SAMTOOLS_SORT.out.bam
     )
+    ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
@@ -165,10 +174,12 @@ workflow VIRALINTEGRATION {
         params.fasta,
         params.viral_fasta
     )
+    ch_versions = ch_versions.mix(INSERTION_SITE_CANDIDATES.out.versions.first())
 
     ABRIDGED_TSV (
         INSERTION_SITE_CANDIDATES.out.full
     )
+    // TODO ch_versions = ch_versions.mix(ABRIDGED_TSV.out.versions.first())
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
@@ -180,6 +191,7 @@ workflow VIRALINTEGRATION {
         params.viral_fasta,
         ch_igvjs_VIF
     )
+    ch_versions = ch_versions.mix(VIRUS_REPORT.out.versions.first())
 
     // TODO Handle insertion_site_candidates
     // File insertion_site_candidates_use = select_first([insertion_site_candidates, InsertionSiteCandidates.filtered_abridged])
@@ -189,6 +201,7 @@ workflow VIRALINTEGRATION {
         params.fasta,
         params.viral_fasta
     )
+    ch_versions = ch_versions.mix(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.versions.first())
 
     STAR_ALIGN_HOST.out.fastq
         .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract)
@@ -199,10 +212,12 @@ workflow VIRALINTEGRATION {
         "illumina",
         false
     )
+    ch_versions = ch_versions.mix(STAR_ALIGN_VALIDATE.out.versions.first())
 
     SAMTOOLS_SORT_VALIDATE (
         STAR_ALIGN_VALIDATE.out.bam
     )
+    ch_versions = ch_versions.mix(SAMTOOLS_SORT_VALIDATE.out.versions.first())
 
     SAMTOOLS_SORT_VALIDATE.out.bam.join(
         SAMTOOLS_INDEX_VALIDATE ( SAMTOOLS_SORT_VALIDATE.out.bam ).bai,
@@ -214,6 +229,7 @@ workflow VIRALINTEGRATION {
     // Check if REMOVE_DUPLICATES.out.bam exists.
     if (!params.remove_duplicates) {
         REMOVE_DUPLICATES ( ch_validate_bam_bai )
+        ch_versions = ch_versions.mix(REMOVE_DUPLICATES.out.versions.first())
         ch_to_dupe_or_not = REMOVE_DUPLICATES.out.bam_bai
     } else {
         ch_to_dupe_or_not = ch_validate_bam_bai
@@ -226,6 +242,7 @@ workflow VIRALINTEGRATION {
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
         ch_validate_bam_bai_gtf
     )
+    ch_versions = ch_versions.mix(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.versions.first())
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
         .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0])
@@ -243,6 +260,7 @@ workflow VIRALINTEGRATION {
         params.gtf,
         ch_igvjs_VIF
     )
+    ch_versions = ch_versions.mix(SUMMARY_REPORT.out.versions.first())
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

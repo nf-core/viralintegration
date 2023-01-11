@@ -12,8 +12,6 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
-
 **nf-core/viralintegration** is a bioinformatics best-practice analysis pipeline for the identification of viral integration events in genomes using a chimeric read approach. It was initially based on the [CTAT-VirusIntegrationFinder](https://github.com/broadinstitute/CTAT-VirusIntegrationFinder).
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
@@ -49,8 +47,6 @@ On release, automated continuous integration tests run the pipeline on a full-si
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
 4. Start running your own analysis!
-
-   <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
    ```bash
    nextflow run nf-core/viralintegration --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>

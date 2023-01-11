@@ -52,6 +52,12 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
+## Options
+
+### Viral FASTA
+
+By default, the pipeline uses the [CTAT-VIF human virus database](https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/wiki/Human-Virus-Database-Prep) to map the raw FastQ reads to the reference genomes. It can be any FASTA sequences of viral sequences of interest.
+
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:

@@ -3,7 +3,8 @@ process SUMMARY_REPORT {
     label 'process_medium'
 
     // TODO Use python 3.6.9 and pigz in their own container
-    if (params.enable_conda) {
+    // Exit if running this module with -profile conda / -profile mamba
+    if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
         exit 1, "Conda environments cannot be used when using the PolyA-stripper script. Please use docker or singularity containers."
     }
     container "trinityctat/ctat_vif"

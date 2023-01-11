@@ -62,11 +62,12 @@ The nf-core/viralintegration pipeline comes with documentation about the pipelin
 
 ## Credits
 
-nf-core/viralintegration was originally written by Robert Allaway.
+nf-core/viralintegration was originally written by Alyssa Briggs ([@alyssa-ab](https://github.com/alyssa-ab)) and Edmund Miller ([@Emiller88](https://github.com/emiller88)) from [The Functional Genomics Laboratory](https://taehoonkim.org/) at [The Univeristy of Texas at Dallas](https://www.utdallas.edu/).
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+- [Tae Hoon Kim](https://github.com/taehoonkim-phd)
+- [Robert Allaway](https://github.com/allaway)
 
 ## Contributions and Support
 

@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir", "viral_fasta"],
+            "required": ["input", "viral_fasta", "outdir", "remove_duplicates", "min_reads", "max_hits"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -24,8 +24,12 @@
                 },
                 "viral_fasta": {
                     "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.fasta",
-                    "description": "Path to fasta file with viral genomes"
+                    "description": "Path to fasta file with viral genomes",
+                    "fa_icon": "fas fa-viruses"
                 },
                 "outdir": {
                     "type": "string",
@@ -47,13 +51,23 @@
                 },
                 "min_reads": {
                     "type": "integer",
-                    "default": "5",
-                    "description": "Minimum reads"
+                    "default": 5,
+                    "description": "Minimum reads",
+                    "fa_icon": "far fa-minus-square",
+                    "minimum": 1
                 },
                 "max_hits": {
                     "type": "integer",
-                    "default": "50",
-                    "description": "Maximum hits"
+                    "default": 50,
+                    "description": "Maximum hits",
+                    "fa_icon": "fas fa-chess-queen",
+                    "minimum": 1
+                },
+                "remove_duplicates": {
+                    "type": "string",
+                    "default": "true",
+                    "description": "To remove duplicate viral hits or not",
+                    "fa_icon": "far fa-copy"
                 }
             }
         },

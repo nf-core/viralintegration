@@ -227,7 +227,7 @@ workflow VIRALINTEGRATION {
 
     ch_to_dupe_or_not = Channel.empty()
     // Check if REMOVE_DUPLICATES.out.bam exists.
-    if (!params.remove_duplicates) {
+    if (params.remove_duplicates) {
         REMOVE_DUPLICATES ( ch_validate_bam_bai )
         ch_versions = ch_versions.mix(REMOVE_DUPLICATES.out.versions.first())
         ch_to_dupe_or_not = REMOVE_DUPLICATES.out.bam_bai

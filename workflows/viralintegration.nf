@@ -65,10 +65,10 @@ include { STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_HOST
           STAR_GENOMEGENERATE as STAR_GENOMEGENERATE_PLUS } from '../modules/nf-core/star/genomegenerate/main'
 include { STAR_ALIGN as STAR_ALIGN_HOST
           STAR_ALIGN as STAR_ALIGN_PLUS } from '../modules/nf-core/star/align/main'
-include { SAMTOOLS_SORT
+include { SAMTOOLS_SORT as SAMTOOLS_SORT_PLUS
           SAMTOOLS_SORT as SAMTOOLS_SORT_VALIDATE
           SAMTOOLS_SORT as SAMTOOLS_SORT_DUPLICATES } from '../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX
+include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_PLUS
           SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE
           SAMTOOLS_INDEX as SAMTOOLS_INDEX_DUPLICATES } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
@@ -152,18 +152,18 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
 
-    SAMTOOLS_SORT (
+    SAMTOOLS_SORT_PLUS (
         STAR_ALIGN_PLUS.out.bam
     )
-    ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
+    ch_versions = ch_versions.mix(SAMTOOLS_SORT_PLUS.out.versions.first())
 
-    SAMTOOLS_INDEX (
-        SAMTOOLS_SORT.out.bam
+    SAMTOOLS_INDEX_PLUS (
+        SAMTOOLS_SORT_PLUS.out.bam
     )
-    ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
+    ch_versions = ch_versions.mix(SAMTOOLS_INDEX_PLUS.out.versions.first())
 
-    SAMTOOLS_SORT.out.bam
-        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+    SAMTOOLS_SORT_PLUS.out.bam
+        .join(SAMTOOLS_INDEX_PLUS.out.bai, by: [0], remainder: true)
         .join(STAR_ALIGN_PLUS.out.junction)
         .set { ch_bam_bai_junction }
 
@@ -179,8 +179,8 @@ workflow VIRALINTEGRATION {
     )
     // TODO ch_versions = ch_versions.mix(ABRIDGED_TSV.out.versions.first())
 
-    SAMTOOLS_SORT.out.bam
-        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+    SAMTOOLS_SORT_PLUS.out.bam
+        .join(SAMTOOLS_INDEX_PLUS.out.bai, by: [0], remainder: true)
         .join(ABRIDGED_TSV.out.filtered_abridged)
         .set { ch_bam_bai_filtered }
 

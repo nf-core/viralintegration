@@ -3,7 +3,7 @@ process STAR_ALIGN_VALIDATE {
     label 'process_high'
 
     // Note: 2.7X indices incompatible with AWS iGenomes.
-    conda (params.enable_conda ? 'bioconda::star=2.7.9a' : null)
+    conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/star:2.7.9a--h9ee0642_0' :
         'quay.io/biocontainers/star:2.7.9a--h9ee0642_0' }"

@@ -64,7 +64,7 @@
                     "minimum": 1
                 },
                 "remove_duplicates": {
-                    "type": "string",
+                    "type": "boolean",
                     "default": "true",
                     "description": "To remove duplicate viral hits or not",
                     "fa_icon": "far fa-copy"

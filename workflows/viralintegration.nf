@@ -274,14 +274,14 @@ workflow VIRALINTEGRATION {
     ch_methods_description = Channel.value(methods_description)
 
     ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_HOST.out.log_final.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN_VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
+        .mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        .mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
+        .mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+        .mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+        .mix(STAR_ALIGN_HOST.out.log_final.collect{it[1]}.ifEmpty([]))
+        .mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
+        .mix(STAR_ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
+        .mix(STAR_ALIGN_VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
 
 
     MULTIQC (

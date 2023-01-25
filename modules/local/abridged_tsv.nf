@@ -24,7 +24,6 @@ process ABRIDGED_TSV {
 
     import pandas as pd
     min_reads = ${params.min_reads}
-    #max_hits = ${params.max_hits}
 
     # write abridged tsv
     df = pd.read_csv("$full_tsv", sep="\\t")

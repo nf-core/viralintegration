@@ -103,10 +103,10 @@ For more information, visit the documentation for [CTAT-VIF](https://github.com/
 - `summary/`
   - `*.vif.genome_plot.png`: Refined genome wide abundance plot
   - `*.vif.html`: Web based interactive genome viewer for virus insertion sites
-  - `*.vif.prelim.refined.tsv`: Insertion site candidates in tab-delimited format
-  - `*.vif.refined.distilled.tsv`: Insertion site candidates in tab-delimited format
-  - `*.vif.refined.tsv`: Insertion site candidates in tab-delimited format
-  - `*.vif.refined.wRefGeneAnnots.tsv`: Insertion site candidates in tab-delimited format with gene annotations
+  - `*.vif.prelim.refined.tsv`: Preliminary insertion site candidates in tab-delimited format
+  - `*.vif.refined.distilled.tsv`: Distilled insertion site candidates in tab-delimited format
+  - `*.vif.refined.tsv`: Refined insertion site candidates in tab-delimited format
+  - `*.vif.refined.wRefGeneAnnots.tsv`: Refined insertion site candidates in tab-delimited format with gene annotations
 
 </details>
 

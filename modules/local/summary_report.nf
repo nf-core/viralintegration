@@ -78,12 +78,11 @@ process SUMMARY_REPORT {
             > ${prefix}.bed
 
         # prep for making the report
-        # bamsifter \\
-        #   -c ${max_coverage} \\
-        #   -o ${prefix}.reads.bam \\
-        #   ${alignment_bam}
-
-        cp ${alignment_bam} ${prefix}.reads.bam
+        # HACK Let's not hard code this in the future
+        /usr/local/src/CTAT-VirusIntegrationFinder/util/bamsifter/bamsifter \\
+            -c ${max_coverage} \\
+            -o ${prefix}.reads.bam \\
+            ${alignment_bam}
 
         # IGV reports expects to find, __PREFIX__.fa, __PREFIX__.bed, __PREFIX__.reads.bam
         ln -sf ${chim_targets_fasta} ${prefix}.fa

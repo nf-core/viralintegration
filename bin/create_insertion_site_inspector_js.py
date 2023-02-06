@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: create_insertion_site_inspector_js.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/create_insertion_site_inspector_js.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/4a0fa8cd0b6de113f0e33ae92332a3cc4d8430e8/util/create_insertion_site_inspector_js.py
+# Download Date: 2022-12-28, commit: 4a0fa8c
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 
 import argparse
 import csv

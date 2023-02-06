@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: incorporate_breakpoint_entropy_n_splice_info.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/incorporate_breakpoint_entropy_n_splice_info.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/6267c557034ba4a7aa5b22f5c20bf69eff85031c/util/incorporate_breakpoint_entropy_n_splice_info.py
+# Download Date: 2022-12-28, commit: 6267c55
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pysam
 from collections import defaultdict

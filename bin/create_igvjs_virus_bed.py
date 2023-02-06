@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
+
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: create_igvjs_virus_bed.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/create_igvjs_virus_bed.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/9b18ce8e55304440cde32bfbd5a8def63d3804ec/util/create_igvjs_virus_bed.py
+# Download Date: 2022-12-28, commit: 9b18ce8
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 if __name__ == "__main__":
     import argparse
     import pandas as pd

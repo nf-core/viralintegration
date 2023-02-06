@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: chimeric_contig_evidence_analyzer.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/chimeric_contig_evidence_analyzer.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/117d8e10e7d7f6949dab7025f40bd8acc3e816d4/util/chimeric_contig_evidence_analyzer.py
+# Download Date: 2022-12-28, commit: 117d8e1
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import os, re, sys
 import argparse
 import subprocess

@@ -1,5 +1,14 @@
 #!/usr/bin/env Rscript
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: plot_top_virus_coverage.R
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/plot_top_virus_coverage.Rscript
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/caddb8a67c6de0b9c3ca4b61d1a9833d94f619c7/util/plot_top_virus_coverage.Rscript
+# Download Date: 2022-12-28, commit: caddb8a
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 options(bitmapType = "cairo") # needed to avoid X11 issue
 
 suppressPackageStartupMessages(library("argparse"))

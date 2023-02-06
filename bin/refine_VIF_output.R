@@ -1,5 +1,14 @@
 #!/usr/bin/env Rscript
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: refine_VIF_output.R
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/refine_VIF_output.Rscript
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/33dcbb06b8394e973aa01c536363557689cea23c/util/refine_VIF_output.Rscript
+# Download Date: 2022-12-28, commit: 33dcbb0
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 
 suppressPackageStartupMessages(library("argparse"))
 suppressPackageStartupMessages(library("tidyverse"))

@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: distill_to_primary_target_list_via_brkpt_homologies.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/distill_to_primary_target_list_via_brkpt_homologies.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/e20a1eb2acefeb23e36719f4c03b0e4e93e6a754/util/distill_to_primary_target_list_via_brkpt_homologies.py
+# Download Date: 2022-12-28, commit: e20a1eb
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import csv
 from collections import defaultdict

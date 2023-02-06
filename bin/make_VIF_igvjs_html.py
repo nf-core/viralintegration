@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: make_VIF_igvjs_html.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/make_VIF_igvjs_html.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/4383a380c6fb92d0427923932fce6192127884a1/util/make_VIF_igvjs_html.py
+# Download Date: 2022-12-28, commit: 4383a38
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import json
 import os
 import re

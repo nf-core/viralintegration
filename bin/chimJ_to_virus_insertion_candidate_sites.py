@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: chimJ_to_virus_insertion_candidate_sites.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/chimJ_to_virus_insertion_candidate_sites.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/034594f47ccf63237eef3d305d07496fe6aeba44/util/chimJ_to_virus_insertion_candidate_sites.py
+# Download Date: 2022-12-28, commit: 034594f
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import argparse
 import subprocess

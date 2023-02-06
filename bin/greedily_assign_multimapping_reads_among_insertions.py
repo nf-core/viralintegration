@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: greedily_assign_multimapping_reads_among_insertions.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/greedily_assign_multimapping_reads_among_insertions.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/551eff101679a0271d8bdfbdfb0d8724c2975c13/util/greedily_assign_multimapping_reads_among_insertions.py
+# Download Date: 2022-12-28, commit: 551eff1
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import csv
 from collections import defaultdict

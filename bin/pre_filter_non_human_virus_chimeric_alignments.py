@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: pre_filter_non_human_virus_chimeric_alignments.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/pre_filter_non_human_virus_chimeric_alignments.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/3938c9074bfe4a718df3f4067b328ab9e304b5a2/util/pre_filter_non_human_virus_chimeric_alignments.py
+# Download Date: 2022-12-28, commit: 3938c90
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import argparse
 import subprocess

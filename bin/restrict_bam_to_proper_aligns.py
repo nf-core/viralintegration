@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: restrict_bam_to_proper_aligns.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/restrict_bam_to_proper_aligns.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/c77cddec755765fe17d66d3805f1eaaaed1fe806/util/restrict_bam_to_proper_aligns.py
+# Download Date: 2022-12-28, commit: c77cdde
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pysam
 import subprocess

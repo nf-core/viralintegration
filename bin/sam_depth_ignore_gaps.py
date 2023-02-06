@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: sam_depth_ignore_gaps.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/sam_depth_ignore_gaps.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/b6be8586fc9282dd3d67459c13248a9a3ef02a01/util/sam_depth_ignore_gaps.py
+# Download Date: 2022-12-28, commit: b6be858
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pysam
 from collections import defaultdict

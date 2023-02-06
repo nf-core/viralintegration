@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: incorporate_read_alignment_stats.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/incorporate_read_alignment_stats.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/9af47f4567cca1263404aa0c535125f34a7577cc/util/incorporate_read_alignment_stats.py
+# Download Date: 2022-12-28, commit: 9af47f4
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pysam
 from collections import defaultdict

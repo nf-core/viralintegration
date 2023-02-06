@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: create_igvjs_virus_fa.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/create_igvjs_virus_fa.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/e7fed4354c3eee1fac3accaac795c0dab5f9afd1/util/create_igvjs_virus_fa.py
+# Download Date: 2022-12-28, commit: e7fed43
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pandas as pd
 import subprocess as sp

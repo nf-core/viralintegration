@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: bam_mark_duplicates.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/bam_mark_duplicates.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/a2844b49e6d097a7c86530f18caa6cf544928242/util/bam_mark_duplicates.py
+# Download Date: 2022-12-28, commit: a2844b4
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import os, sys, re
 import logging
 import argparse

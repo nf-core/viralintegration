@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: fastq_polyA_stripper.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/fastq_polyA_stripper.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/f60d4e82e48d2bc22f7422f81844774467300a82/util/fastq_polyA_stripper.py
+# Download Date: 2022-12-28, commit: f60d4e8
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import os, sys, re
 import logging
 import argparse

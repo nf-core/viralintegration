@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: examine_flanking_uniq_kmer_composition.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/examine_flanking_uniq_kmer_composition.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/5b6d71b3d0e4a83a4b41dfb0a0b7ab2c8b18ef83/util/examine_flanking_uniq_kmer_composition.py
+# Download Date: 2022-12-28, commit: 5b6d71b
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pandas as pd
 import argparse

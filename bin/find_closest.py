@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: find_closest.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/find_closest.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/677ddfc002009400ff5a0879ad2cf670933fdc66/util/find_closest.py
+# Download Date: 2022-12-28, commit: 677ddfc
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys
 import argparse
 import os

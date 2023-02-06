@@ -1,5 +1,14 @@
 #!/usr/bin/env Rscript
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: make_VIF_genome_abundance_plot.R
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/make_VIF_genome_abundance_plot.Rscript
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/4a5502f1c1421e4f2d3eb2295da5e970fce46e13/util/make_VIF_genome_abundance_plot.Rscript
+# Download Date: 2022-12-28, commit: 4a5502f
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 options(bitmapType = "cairo") # needed to avoid X11 issue
 
 condense_data <- function(data) {

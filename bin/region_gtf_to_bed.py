@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: region_gtf_to_bed.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/region_gtf_to_bed.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/01be10e1041301cd5df4350664380d4563df1704/util/region_gtf_to_bed.py
+# Download Date: 2022-12-28, commit: 01be10e
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 
 

@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: extract_chimeric_genomic_targets.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/extract_chimeric_genomic_targets.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/c4d4eb42be29d21c561bef49460c92206ccc5598/util/extract_chimeric_genomic_targets.py
+# Download Date: 2022-12-28, commit: c4d4eb4
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import os, re, sys
 import argparse
 import subprocess

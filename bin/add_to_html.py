@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
+
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: add_to_html.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/add_to_html.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/3082b0a027e5f6c224cc9fd3cdbe8bf72fb04ec7/util/add_to_html.py
+# Download Date: 2022-12-28, commit: 3082b0a
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import base64
 
 

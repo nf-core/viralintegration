@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+#########################################
+# Author: [brianjohnhaas](https://github.com/brianjohnhaas)
+# File: extract_prelim_chimeric_genome_read_alignments.py
+# Source: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/master/util/extract_prelim_chimeric_genome_read_alignments.py
+# Source+commit: https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/blob/1553104ae8fb5bd1631d8122ff1b5cc9e6093640/util/extract_prelim_chimeric_genome_read_alignments.py
+# Download Date: 2022-12-28, commit: 1553104
+# This source code is licensed under the BSD 3-Clause license
+#########################################
+
 import sys, os, re
 import pysam
 from collections import defaultdict

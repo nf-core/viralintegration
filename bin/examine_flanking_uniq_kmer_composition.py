@@ -15,7 +15,6 @@ import argparse
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="include fraction unique kmer content metric",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -52,7 +51,6 @@ def main():
 
 
 def examine_unique_kmer_fraction(row):
-
     row["flankA_fU"] = fraction_unique(row["flankA"])
     row["flankB_fU"] = fraction_unique(row["flankB"])
 
@@ -60,7 +58,6 @@ def examine_unique_kmer_fraction(row):
 
 
 def fraction_unique(nuc_seq):
-
     K = 5
     uniq_kmers = set()
     kmer_count = 0

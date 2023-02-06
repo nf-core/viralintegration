@@ -28,7 +28,6 @@ logging.basicConfig(
 
 
 def main():
-
     arg_parser = argparse.ArgumentParser(
         description="extracts target regions for candidate integration event site for draft evaluation",
         formatter_class=argparse.RawTextHelpFormatter,
@@ -90,7 +89,6 @@ def main():
 
 
 def write_genome_target_regions(event_info_dict, ref_genome_fasta, patch_db_fasta, output_prefix, pad_region_length):
-
     patch_db_entries = set()
     with open(patch_db_fasta, "rt") as fh:
         for line in fh:
@@ -106,7 +104,6 @@ def write_genome_target_regions(event_info_dict, ref_genome_fasta, patch_db_fast
     ofh_gtf = open(out_gtf_filename, "wt")
 
     for event in event_info_dict.values():
-
         event_acc = event["entry"]
 
         chrA = event["chrA"]
@@ -204,7 +201,6 @@ def write_genome_target_regions(event_info_dict, ref_genome_fasta, patch_db_fast
 
 
 def extract_seq_region(fasta_filename, chr, lend, rend, orient):
-
     cmd = 'samtools faidx {} "{}":{}-{}'.format(fasta_filename, chr, lend, rend, orient)
 
     if orient == "-":
@@ -216,7 +212,6 @@ def extract_seq_region(fasta_filename, chr, lend, rend, orient):
 
 
 def parse_chim_events(chim_events_filename):
-
     event_info_dict = dict()
 
     csv.field_size_limit(int(1e6))

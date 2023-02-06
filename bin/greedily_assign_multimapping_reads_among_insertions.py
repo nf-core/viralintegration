@@ -16,7 +16,6 @@ import argparse
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="regroups breakpoints based on virus single breakends",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -145,7 +144,6 @@ def main():
 
         # report entries
         for loc_row in shared_virus_brkpt_rows:
-
             if not INCLUDE_READNAMES:
                 del loc_row["readnames"]
                 del loc_row["excluded_reads"]
@@ -155,14 +153,12 @@ def main():
                 and loc_row["adj_total"] / top_score >= MIN_ALT_BREAK_FRAC_READS
                 and float(loc_row["frac_reads_removed"]) < MAX_FRAC_MULTIMAPPING_NONPRIMARY
             ):
-
                 writer.writerow(loc_row)
 
         processed_brkpts.add(virus_brkpt_token)
 
 
 def compute_adjusted_total(row, ev_reads_seen):
-
     readnames = row["readnames"].split(",")
     adj_readnames = list()
     excluded_readnames = list()
@@ -179,7 +175,6 @@ def compute_adjusted_total(row, ev_reads_seen):
 
 
 def add_ev_read_exclusion(row, ev_reads_seen):
-
     readnames = row["readnames"].split(",")
     for readname in readnames:
         ev_reads_seen.add(readname)

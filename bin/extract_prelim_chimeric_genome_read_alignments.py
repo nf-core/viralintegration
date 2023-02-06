@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )

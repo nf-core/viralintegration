@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="add alignment stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -117,7 +116,6 @@ def main():
         min_anchor_lengths = list()
 
         for readname in readnames:
-
             if readname not in read_to_hit_count:
                 raise RuntimeError("Error, missing hit count for read: {}".format(readname))
 

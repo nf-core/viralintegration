@@ -19,7 +19,6 @@ from igv_reports import datauri
 
 
 def create_fusion_report(template, fusions, output_filename, input_file_prefix):
-
     basedir = os.path.dirname(fusions)
 
     data_uris = {}
@@ -52,7 +51,6 @@ def create_fusion_report(template, fusions, output_filename, input_file_prefix):
 
     ## make data uri's for each of the referenced input filenames in the html doc
     for line_index, line in enumerate(input_lines):
-
         is_index = line.find("indexURL:") > 0
         if is_index:
             # ignore the index files

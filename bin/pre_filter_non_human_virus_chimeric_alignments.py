@@ -56,7 +56,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="filters out chimeric alignments not involving human--virus or any involving chrM",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -125,7 +124,6 @@ def main():
     prev_nonrelevant_chim = False
 
     for row in reader:
-
         read_name = row["read_name"]
         if read_name != prev_read_name:
             if not prev_nonrelevant_chim:

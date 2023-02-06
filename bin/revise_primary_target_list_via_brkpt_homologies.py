@@ -16,7 +16,6 @@ import argparse
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="assign Maybe status to top entries of breakpoint homology groups",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -102,7 +101,6 @@ def main():
 
         # report entries
         for loc_row in shared_virus_brkpt_rows:
-
             writer.writerow(loc_row)
 
         processed_brkpts.add(virus_brkpt_token)

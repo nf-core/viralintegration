@@ -15,7 +15,6 @@ import subprocess
 
 
 def main():
-
     usage = "\n\n\tusage: {} (filename.bam (or - for stdin))  output.bam\n\n".format(sys.argv[0])
 
     if len(sys.argv) < 3:

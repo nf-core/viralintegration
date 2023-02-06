@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="add breakpoint entropy stats", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -62,7 +61,6 @@ def main():
     flank_len = 30
 
     def get_breakpoint_flanking_seq(acc, coord, orient, left_or_right_side):
-
         # coord represents donor or acceptor site position
         # so need to adjust for sequence extraction based on left/right and orientation info.
 
@@ -135,7 +133,6 @@ def main():
 
 
 def extract_seqrange(acc, fasta_filename, lend, rend):
-
     cmd = f"samtools faidx {fasta_filename} {acc}:{lend}-{rend}"
 
     logger.info(cmd)
@@ -147,7 +144,6 @@ def extract_seqrange(acc, fasta_filename, lend, rend):
 
 
 def compute_entropy(seq_txt, left_or_right):
-
     seq_txt = seq_txt.upper()
 
     # remove splice dinucs
@@ -175,7 +171,6 @@ revcomp_translation = {"G": "C", "g": "c", "C": "G", "c": "g", "A": "T", "a": "t
 
 
 def revcomp(sequence):
-
     sequence = list(sequence)
     sequence = sequence[::-1]  # rev it
 
@@ -187,7 +182,6 @@ def revcomp(sequence):
 
 
 def get_splice_info(flankA, flankB):
-
     splice_signals = {"GT-AG", "GC-AG"}
 
     spliceA = flankA[-2:]

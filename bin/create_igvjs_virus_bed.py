@@ -31,7 +31,6 @@ if __name__ == "__main__":
     # df.sort_values(by='mapped', ascending=False, inplace=True) # no, keep incoming sort order.
 
     if args.num_top_viruses is not None and args.num_top_viruses >= 1 and len(df) > args.num_top_viruses:
-
         df = df.head(args.num_top_viruses)
 
     df.to_csv(args.output_prefix + ".igvjs.table.tsv", index=False, sep="\t")

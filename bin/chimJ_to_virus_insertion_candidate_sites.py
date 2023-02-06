@@ -54,7 +54,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="Defines candidate virus insertion sites based on chimeric reads",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -245,7 +244,6 @@ def main():
     )
 
     if remove_duplicates_flag:
-
         logger.info("## Duplicate read alignments")
         # ~~~~~~~~~~~~~~~~~~~~~~~~~
         # Duplicates
@@ -314,7 +312,6 @@ def main():
 
     # Loop over the different chimeric pairs (genome_pair_to_evidence dict keys)
     for genome_pair in genome_pair_to_evidence:
-
         # Get the Chimeric_read object for the given Chrom-Virus pairing
         chim_reads = genome_pair_to_evidence[genome_pair]
 
@@ -341,7 +338,6 @@ def main():
 
     with open(output_filename_abridged, "wt") as ofh:
         with open(output_filename_full, "wt") as ofh_full:
-
             # print header
             ofh.write(
                 "\t".join(
@@ -400,7 +396,6 @@ def main():
             )
 
             for chim_event in all_chim_events:
-
                 chim_event.refine_insertion_coordinates()
 
                 print(chim_event.get_event_accession() + "\t" + str(chim_event), file=ofh)
@@ -487,7 +482,6 @@ def supplements_existing_event(
 
     # Loop over stored Chimeric events
     for prev_chim_event in chim_events_list:
-
         # if the orientation is the same
         # if the read falls within the given distance from each other
         # then combine them
@@ -498,7 +492,6 @@ def supplements_existing_event(
             and chim_event.orientB == prev_chim_event.orientB
             and abs(chim_event.coordB - prev_chim_event.coordB) <= agg_dist_B
         ):
-
             logger.debug("-adding {} as supplement to {}".format(str(chim_event), str(prev_chim_event)))
             # append this chimeric event to the previous
             prev_chim_event.absorb_nearby_chim_event(chim_event)
@@ -509,7 +502,6 @@ def supplements_existing_event(
 
 
 def gather_top_event_reads(reads_list):
-
     # count reads according to breakpoint.
 
     brkpt_counter = defaultdict(int)

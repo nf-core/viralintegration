@@ -13,7 +13,6 @@ import sys, os, re
 
 
 def main():
-
     if len(sys.argv) < 2:
         print(
             "\n\n\tusage: {} regions.gtf >  regions.bed\n\n".format(sys.argv[0]),

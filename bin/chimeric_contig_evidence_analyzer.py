@@ -31,7 +31,6 @@ DEBUG = False
 
 
 def main():
-
     arg_parser = argparse.ArgumentParser(
         description="counts spanning and split evidence reads\n", formatter_class=argparse.RawTextHelpFormatter
     )
@@ -130,7 +129,6 @@ def main():
 
 
 def analyze_bam_n_gtf(bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min_seq_entropy, min_per_id, removed_tsv):
-
     # ~~~~~~~~~~~~~~~~~~~~~~~~~
     # Read in the bam file
     # ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -321,7 +319,6 @@ def analyze_bam_n_gtf(bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min
 
 
 def update_anchor_lengths(anchor_len_list, brkpt, aligned_blocks):
-
     this_read_anchor_len_list = [0, 0]
 
     for align_block in aligned_blocks:
@@ -371,7 +368,6 @@ def excessive_clipping(aligned_read, max_end_clip):
 
 
 def seq_entropy(sequence):
-
     # lazy, using code from here: https://onestopdataanalysis.com/shannon-entropy/
 
     m = len(sequence)
@@ -390,7 +386,6 @@ def seq_entropy(sequence):
 
 
 def per_id(aligned_read):
-
     cigartuples = aligned_read.cigartuples
 
     num_matches = 0
@@ -407,7 +402,6 @@ def per_id(aligned_read):
 
 
 def parse_region_pairs_from_gtf(gtf_file):
-
     contig_to_region_pair_dict = defaultdict(list)
 
     with open(gtf_file, "rt") as fh:

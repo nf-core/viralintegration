@@ -18,7 +18,6 @@ from collections import defaultdict
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="strips polyA from reads", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -76,7 +75,6 @@ def main():
         left_readseq, left_quals = polyA_trim(left_readseq, left_quals, trim_config)
 
         if right_fq_iterator is not None:
-
             right_read_tuple = next(right_fq_iterator)
             right_readname, right_readseq, right_L3, right_quals = right_read_tuple
 
@@ -86,7 +84,6 @@ def main():
 
             ## PE mode
             if left_readseq != "":
-
                 right_readseq_len = len(right_readseq)
 
                 right_readseq, right_quals = polyA_trim(right_readseq, right_quals, trim_config)
@@ -123,7 +120,6 @@ def main():
 
 
 def core_readname(readname):
-
     core_readname = readname.split(" ")[0]
 
     core_readname = re.sub("/[12]$", "", core_readname)
@@ -132,7 +128,6 @@ def core_readname(readname):
 
 
 def polyA_trim(readseq, quals, trim_config):
-
     # trim terminal polyA
     readseq, quals = terminal_trim(readseq, quals, "A", trim_config)
 
@@ -162,7 +157,6 @@ def terminal_trim(readseq, quals, nucleotide, trim_config):
 
 
 def initial_trim(readseq, quals, nucleotide, trim_config):
-
     revreadseq = readseq[::-1]
     trim_pos = compute_trim_pos(revreadseq, nucleotide, trim_config)
     if trim_pos is not None:
@@ -175,7 +169,6 @@ def initial_trim(readseq, quals, nucleotide, trim_config):
 
 
 def compute_trim_pos(readseq, nucleotide, trim_config):
-
     score = 0
     max_score = 0
     max_score_pos = -1
@@ -201,7 +194,6 @@ def compute_trim_pos(readseq, nucleotide, trim_config):
 
 
 def fastq_iterator(fastq_filename):
-
     if re.search(".gz$", fastq_filename):
         fh = gzip.open(fastq_filename, "rt", encoding="utf-8")
     else:
@@ -233,7 +225,6 @@ def _get_trim_config():
 
 
 def test_trim_poly():
-
     trim_config = _get_trim_config()
 
     readseq = "TTTTTTTTTTTTTTTTGATCGATCGATCAAAAAAAAAAAAAAA"
@@ -243,7 +234,6 @@ def test_trim_poly():
 
 
 def test_no_trim():
-
     trim_config = _get_trim_config()
 
     readseq = "TTGGCTCTTATCTACTTTGGAGGCCTGTCTGGCTCCTTTCTCTACAC"

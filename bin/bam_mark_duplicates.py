@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="mark duplicates in bam", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )

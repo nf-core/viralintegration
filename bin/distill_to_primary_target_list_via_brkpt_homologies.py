@@ -16,7 +16,6 @@ import argparse
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="assign Maybe status to top entries of breakpoint homology groups",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

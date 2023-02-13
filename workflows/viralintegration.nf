@@ -72,6 +72,7 @@ include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_PLUS
           SAMTOOLS_INDEX as SAMTOOLS_INDEX_VALIDATE
           SAMTOOLS_INDEX as SAMTOOLS_INDEX_DUPLICATES } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { METAPHLAN3_METAPHLAN3       } from '../modules/nf-core/metaphlan3/metaphlan3/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
@@ -128,6 +129,12 @@ workflow VIRALINTEGRATION {
     POLYA_STRIPPER (
         TRIMMOMATIC.out.trimmed_reads
     )
+
+    METAPHLAN3_METAPHLAN3 (
+        POLYA_STRIPPER.out.polya_trimmed,
+        params.metaphlan_db
+    )
+
     ch_versions = ch_versions.mix(POLYA_STRIPPER.out.versions.first())
 
     CAT_FASTA (

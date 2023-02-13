@@ -57,6 +57,7 @@ include { CHIMERIC_READS } from '../subworkflows/local/chimeric_reads'
 //
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { METAPHLAN3_METAPHLAN3       } from '../modules/nf-core/metaphlan3/metaphlan3/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
@@ -100,8 +101,13 @@ workflow VIRALINTEGRATION {
     ch_versions = ch_versions.mix(HOST.out.versions)
 
     //
-    // MODULE: CAT viral and host reference fastas.
+    // MODULE: Run MetaPhlAn3
     //
+
+    METAPHLAN3_METAPHLAN3 (
+        HOST.out.polya_trimmed,
+        params.metaphlan_db
+    )
 
     CAT_FASTA (
         params.fasta,

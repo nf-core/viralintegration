@@ -1,0 +1,74 @@
+Changes in module 'nf-core/star/align'
+--- modules/nf-core/star/align/main.nf
++++ modules/nf-core/star/align/main.nf
+@@ -2,15 +2,16 @@
+     tag "$meta.id"
+     label 'process_high'
+ 
+-    conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
++    // Note: 2.7X indices incompatible with AWS iGenomes.
++    conda "bioconda::star=2.7.9a"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' :
+-        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' }"
++        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' :
++        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' }"
+ 
+     input:
+     tuple val(meta), path(reads)
+-    path index
+-    path gtf
++    path  index
++    path  gtf
+     val star_ignore_sjdbgtf
+     val seq_platform
+     val seq_center
+@@ -51,9 +52,7 @@
+         $ignore_gtf \\
+         $seq_center \\
+         $args
+-
+     $mv_unsorted_bam
+-
+     if [ -f ${prefix}.Unmapped.out.mate1 ]; then
+         mv ${prefix}.Unmapped.out.mate1 ${prefix}.unmapped_1.fastq
+         gzip ${prefix}.unmapped_1.fastq
+@@ -62,36 +61,9 @@
+         mv ${prefix}.Unmapped.out.mate2 ${prefix}.unmapped_2.fastq
+         gzip ${prefix}.unmapped_2.fastq
+     fi
+-
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         star: \$(STAR --version | sed -e "s/STAR_//g")
+-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+-        gawk: \$(echo \$(gawk --version 2>&1) | sed 's/^.*GNU Awk //; s/, .*\$//')
+     END_VERSIONS
+     """
+-
+-    stub:
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-    """
+-    touch ${prefix}Xd.out.bam
+-    touch ${prefix}.Log.final.out
+-    touch ${prefix}.Log.out
+-    touch ${prefix}.Log.progress.out
+-    touch ${prefix}.sortedByCoord.out.bam
+-    touch ${prefix}.toTranscriptome.out.bam
+-    touch ${prefix}.Aligned.unsort.out.bam
+-    touch ${prefix}.unmapped_1.fastq.gz
+-    touch ${prefix}.unmapped_2.fastq.gz
+-    touch ${prefix}.tab
+-    touch ${prefix}.Chimeric.out.junction
+-    touch ${prefix}.out.sam
+-
+-    cat <<-END_VERSIONS > versions.yml
+-    "${task.process}":
+-        star: \$(STAR --version | sed -e "s/STAR_//g")
+-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+-        gawk: \$(echo \$(gawk --version 2>&1) | sed 's/^.*GNU Awk //; s/, .*\$//')
+-    END_VERSIONS
+-    """
+-}
++}
+************************************************************

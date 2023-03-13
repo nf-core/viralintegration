@@ -3,7 +3,7 @@
 //
 
 include { STAR_ALIGN } from '../../modules/nf-core/star/align/main.nf'
-include { STAR_GENOMEGENERATE_GENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
+include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
 
 workflow HOST_STAR {
     take:
@@ -12,7 +12,9 @@ workflow HOST_STAR {
     gtf //   file: /path/to/gtf/
 
     main:
-    STAR_GENOMEGENEREATE (
+    ch_versions = Channel.empty()
+
+    STAR_GENOMEGENERATE (
         fasta,
         gtf
     )

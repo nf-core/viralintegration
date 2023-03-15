@@ -49,13 +49,13 @@ workflow HOST {
 
     index = ch_star_index
 
-    bam = STAR_ALIGN.out.bam
     log_final = STAR_ALIGN.out.log_final
     log_out = STAR_ALIGN.out.log_out
     log_progress = STAR_ALIGN.out.log_progress
     fastq = STAR_ALIGN.out.fastq
 
     trimmed_reads = TRIMMOMATIC.out.trimmed_reads
+    //mqc_log = TRIMMOMATIC.out.mqc_log
 
     polya_trimmed = POLYA_STRIPPER.out.polya_trimmed
 

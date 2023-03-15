@@ -37,6 +37,7 @@ workflow PLUS {
     index = ch_star_index
 
     bam = STAR_ALIGN.out.bam
+    junction = STAR_ALIGN.out.junction
     log_final = STAR_ALIGN.out.log_final
     log_out = STAR_ALIGN.out.log_out
     log_progress = STAR_ALIGN.out.log_progress

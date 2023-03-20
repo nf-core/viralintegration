@@ -2,7 +2,7 @@
 // Align filtered reads against combined host and viral reference.
 //
 
-include { STAR_ALIGN } from '../../modules/nf-core/star/align/main.nf'
+include { STAR_ALIGN as STAR_ALIGN_PLUS } from '../../modules/nf-core/star/align/main.nf'
 include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
@@ -23,7 +23,7 @@ workflow PLUS {
     ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions.first())
     ch_star_index = STAR_GENOMEGENERATE.out.index
 
-    STAR_ALIGN (
+    STAR_ALIGN_PLUS (
         reads,
         ch_star_index,
         gtf,
@@ -31,10 +31,10 @@ workflow PLUS {
         "illumina",
         false
     )
-    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first())
+    ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
 
     SAMTOOLS_SORT (
-        STAR_ALIGN.out.bam
+        STAR_ALIGN_PLUS.out.bam
     )
     ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
 
@@ -45,7 +45,7 @@ workflow PLUS {
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(STAR_ALIGN.out.junction)
+        .join(STAR_ALIGN_PLUS.out.junction)
         .set { ch_bam_bai_junction }
 
 
@@ -54,11 +54,11 @@ workflow PLUS {
 
     index = ch_star_index
 
-    bam = STAR_ALIGN.out.bam
-    junction = STAR_ALIGN.out.junction
-    log_final = STAR_ALIGN.out.log_final
-    log_out = STAR_ALIGN.out.log_out
-    log_progress = STAR_ALIGN.out.log_progress
+    bam = STAR_ALIGN_PLUS.out.bam
+    junction = STAR_ALIGN_PLUS.out.junction
+    log_final = STAR_ALIGN_PLUS.out.log_final
+    log_out = STAR_ALIGN_PLUS.out.log_out
+    log_progress = STAR_ALIGN_PLUS.out.log_progress
 
     sam_bam = SAMTOOLS_SORT.out.bam
 

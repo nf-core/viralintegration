@@ -43,6 +43,11 @@ workflow PLUS {
     )
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
+    SAMTOOLS_SORT.out.bam
+        .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
+        .join(STAR_ALIGN.out.junction)
+        .set { ch_bam_bai_junction }
+
 
     emit:
     reads                  // channel: [ val(meta), [ reads ] ]
@@ -55,9 +60,11 @@ workflow PLUS {
     log_out = STAR_ALIGN.out.log_out
     log_progress = STAR_ALIGN.out.log_progress
 
-    sambam = SAMTOOLS_SORT.out.bam
+    sam_bam = SAMTOOLS_SORT.out.bam
 
     bai = SAMTOOLS_INDEX.out.bai
+
+    bam_bai_junction = ch_bam_bai_junction
 
     versions = ch_versions // channel: [ versions.yml ]
 }

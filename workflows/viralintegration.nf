@@ -49,6 +49,9 @@ include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { HOST        } from '../subworkflows/local/host'
+include { PLUS        } from '../subworkflows/local/plus'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,32 +106,16 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
-    STAR_GENOMEGENERATE_HOST (
+    //
+    // SUBWORKFLOW: Align input reads against host genome.
+    //
+
+    HOST (
+        INPUT_CHECK.out.reads,
         params.fasta,
         params.gtf
     )
-    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE_HOST.out.versions)
-
-    // TODO Use igenomes
-    STAR_ALIGN_HOST (
-        INPUT_CHECK.out.reads,
-        STAR_GENOMEGENERATE_HOST.out.index,
-        params.gtf,
-        false,
-        "illumina",
-        false
-    )
-    ch_versions = ch_versions.mix(STAR_ALIGN_HOST.out.versions.first())
-
-    TRIMMOMATIC (
-        STAR_ALIGN_HOST.out.fastq
-    )
-    ch_versions = ch_versions.mix(TRIMMOMATIC.out.versions.first())
-
-    POLYA_STRIPPER (
-        TRIMMOMATIC.out.trimmed_reads
-    )
-    ch_versions = ch_versions.mix(POLYA_STRIPPER.out.versions.first())
+    ch_versions = ch_versions.mix(HOST.out.versions)
 
     CAT_FASTA (
         params.fasta,
@@ -136,39 +123,19 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(CAT_FASTA.out.versions)
 
-    STAR_GENOMEGENERATE_PLUS (
+    //
+    // SUBWORKFLOW: Align filtered reads against combined host and viral reference.
+    //
+
+    PLUS (
+        HOST.out.polya_trimmed,
         CAT_FASTA.out.plus_fasta,
         params.gtf
     )
-    ch_versions = ch_versions.mix(STAR_GENOMEGENERATE_PLUS.out.versions)
-
-    STAR_ALIGN_PLUS (
-        POLYA_STRIPPER.out.polya_trimmed,
-        STAR_GENOMEGENERATE_PLUS.out.index,
-        params.gtf,
-        false,
-        "illumina",
-        false
-    )
-    ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
-
-    SAMTOOLS_SORT_PLUS (
-        STAR_ALIGN_PLUS.out.bam
-    )
-    ch_versions = ch_versions.mix(SAMTOOLS_SORT_PLUS.out.versions.first())
-
-    SAMTOOLS_INDEX_PLUS (
-        SAMTOOLS_SORT_PLUS.out.bam
-    )
-    ch_versions = ch_versions.mix(SAMTOOLS_INDEX_PLUS.out.versions.first())
-
-    SAMTOOLS_SORT_PLUS.out.bam
-        .join(SAMTOOLS_INDEX_PLUS.out.bai, by: [0], remainder: true)
-        .join(STAR_ALIGN_PLUS.out.junction)
-        .set { ch_bam_bai_junction }
+    ch_versions = ch_versions.mix(PLUS.out.versions)
 
     INSERTION_SITE_CANDIDATES (
-        ch_bam_bai_junction,
+        PLUS.out.bam_bai_junction,
         params.fasta,
         params.viral_fasta
     )
@@ -179,8 +146,8 @@ workflow VIRALINTEGRATION {
     )
     // TODO ch_versions = ch_versions.mix(ABRIDGED_TSV.out.versions.first())
 
-    SAMTOOLS_SORT_PLUS.out.bam
-        .join(SAMTOOLS_INDEX_PLUS.out.bai, by: [0], remainder: true)
+    PLUS.out.sam_bam
+        .join(PLUS.out.bai, by: [0], remainder: true)
         .join(ABRIDGED_TSV.out.filtered_abridged)
         .set { ch_bam_bai_filtered }
 
@@ -201,12 +168,12 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.versions.first())
 
-    STAR_ALIGN_HOST.out.fastq
+    HOST.out.fastq
         .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract)
         .set { ch_unaligned_fastq_fasta }
     STAR_ALIGN_VALIDATE (
         ch_unaligned_fastq_fasta,
-        STAR_GENOMEGENERATE_PLUS.out.index,
+        PLUS.out.index,
         "illumina",
         false
     )
@@ -278,9 +245,9 @@ workflow VIRALINTEGRATION {
         .mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
         .mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         .mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-        .mix(STAR_ALIGN_HOST.out.log_final.collect{it[1]}.ifEmpty([]))
-        .mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
-        .mix(STAR_ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
+        .mix(HOST.out.log_final.collect{it[1]}.ifEmpty([]))
+        //.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
+        .mix(PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
         .mix(STAR_ALIGN_VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
 
 

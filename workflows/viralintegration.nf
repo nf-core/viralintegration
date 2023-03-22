@@ -50,6 +50,7 @@ include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { HOST        } from '../subworkflows/local/host'
 include { PLUS        } from '../subworkflows/local/plus'
+include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
 
 
 /*
@@ -141,42 +142,22 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(PLUS.out.versions)
 
-    INSERTION_SITE_CANDIDATES (
+    //
+    // SUBWORKFLOW: Map potential virus insertion sites and create virus infection evidence viewer.
+    //
+
+    INSERTION_SITES (
         PLUS.out.bam_bai_junction,
         params.fasta,
-        params.viral_fasta
-    )
-    ch_versions = ch_versions.mix(INSERTION_SITE_CANDIDATES.out.versions.first())
-
-    ABRIDGED_TSV (
-        INSERTION_SITE_CANDIDATES.out.full
-    )
-    // TODO ch_versions = ch_versions.mix(ABRIDGED_TSV.out.versions.first())
-
-    PLUS.out.sam_bam
-        .join(PLUS.out.bai, by: [0], remainder: true)
-        .join(ABRIDGED_TSV.out.filtered_abridged)
-        .set { ch_bam_bai_filtered }
-
-    VIRUS_REPORT (
-        ch_bam_bai_filtered,
         params.viral_fasta,
+        PLUS.out.sam_bam,
+        PLUS.out.bai,
         ch_igvjs_VIF
     )
-    ch_versions = ch_versions.mix(VIRUS_REPORT.out.versions.first())
-
-    // TODO Handle insertion_site_candidates
-    // File insertion_site_candidates_use = select_first([insertion_site_candidates, InsertionSiteCandidates.filtered_abridged])
-
-    EXTRACT_CHIMERIC_GENOMIC_TARGETS (
-        ABRIDGED_TSV.out.filtered_abridged,
-        params.fasta,
-        params.viral_fasta
-    )
-    ch_versions = ch_versions.mix(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.versions.first())
+    ch_versions = ch_versions.mix(INSERTION_SITES.out.versions)
 
     HOST.out.fastq
-        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract)
+        .join(INSERTION_SITES.out.fasta_extract)
         .set { ch_unaligned_fastq_fasta }
     STAR_ALIGN_VALIDATE (
         ch_unaligned_fastq_fasta,
@@ -208,7 +189,7 @@ workflow VIRALINTEGRATION {
     }
 
     ch_to_dupe_or_not
-        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
+        .join(INSERTION_SITES.out.gtf_extract, by: [0])
         .set { ch_validate_bam_bai_gtf }
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
@@ -218,13 +199,13 @@ workflow VIRALINTEGRATION {
 
     CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
         .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0])
-        .join(ABRIDGED_TSV.out.filtered_abridged, by: [0])
+        .join(INSERTION_SITES.out.filtered_abridged, by: [0])
         .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts, by: [0])
-        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.gtf_extract, by: [0])
-        .join(EXTRACT_CHIMERIC_GENOMIC_TARGETS.out.fasta_extract, by: [0])
-        .join(VIRUS_REPORT.out.genome_abundance_plot, by: [0])
-        .join(VIRUS_REPORT.out.read_counts_image, by: [0])
-        .join(VIRUS_REPORT.out.read_counts_log_image, by: [0])
+        .join(INSERTION_SITES.out.gtf_extract, by: [0])
+        .join(INSERTION_SITES.out.fasta_extract, by: [0])
+        .join(INSERTION_SITES.out.genome_abundance_plot, by: [0])
+        .join(INSERTION_SITES.out.read_counts_image, by: [0])
+        .join(INSERTION_SITES.out.read_counts_log_image, by: [0])
         .set { ch_summary_report }
 
     SUMMARY_REPORT(

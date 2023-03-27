@@ -41,6 +41,7 @@ workflow VALIDATE {
     emit:
 
     bam_bai = ch_validate_bam_bai
+    log_final = STAR_ALIGN_VALIDATE.out.log_final
 
     versions = ch_versions // channel: [ versions.yml ]
 }

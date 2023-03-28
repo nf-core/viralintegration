@@ -33,15 +33,7 @@ ch_igvjs_VIF             = file("$projectDir/assets/igvjs_VIF.html", checkIfExis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { POLYA_STRIPPER } from '../modules/local/polyA_stripper'
 include { CAT_FASTA } from '../modules/local/cat_fasta'
-include { INSERTION_SITE_CANDIDATES } from '../modules/local/insertion_site_candidates'
-include { ABRIDGED_TSV } from '../modules/local/abridged_tsv'
-include { VIRUS_REPORT } from '../modules/local/virus_report'
-include { EXTRACT_CHIMERIC_GENOMIC_TARGETS } from '../modules/local/extract_chimeric_genomic_targets'
-include { CHIMERIC_CONTIG_EVIDENCE_ANALYZER } from '../modules/local/chimeric_contig_evidence_analyzer'
-include { SUMMARY_REPORT } from '../modules/local/summary_report'
-include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -51,7 +43,7 @@ include { HOST        } from '../subworkflows/local/host'
 include { PLUS        } from '../subworkflows/local/plus'
 include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
 include { VALIDATE } from '../subworkflows/local/validate'
-
+include { CHIMERIC_READS } from '../subworkflows/local/chimeric_reads'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,8 +55,6 @@ include { VALIDATE } from '../subworkflows/local/validate'
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { SAMTOOLS_SORT as SAMTOOLS_SORT_DUPLICATES } from '../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_DUPLICATES } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -123,6 +113,10 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(HOST.out.versions)
 
+    //
+    // MODULE: CAT viral and host reference fastas.
+    //
+
     CAT_FASTA (
         params.fasta,
         params.viral_fasta
@@ -165,43 +159,22 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(VALIDATE.out.versions)
 
+    //
+    // SUBWORKFLOW: Refine chimeric read counts and create final summary report.
+    //
 
-    ch_to_dupe_or_not = Channel.empty()
-    // Check if REMOVE_DUPLICATES.out.bam exists.
-    if (params.remove_duplicates) {
-        REMOVE_DUPLICATES ( VALIDATE.out.bam_bai )
-        ch_versions = ch_versions.mix(REMOVE_DUPLICATES.out.versions.first())
-        ch_to_dupe_or_not = REMOVE_DUPLICATES.out.bam_bai
-    } else {
-        ch_to_dupe_or_not = VALIDATE.out.bam_bai
-    }
-
-    ch_to_dupe_or_not
-        .join(INSERTION_SITES.out.gtf_extract, by: [0])
-        .set { ch_validate_bam_bai_gtf }
-
-    CHIMERIC_CONTIG_EVIDENCE_ANALYZER (
-        ch_validate_bam_bai_gtf
-    )
-    ch_versions = ch_versions.mix(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.versions.first())
-
-    CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bam
-        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_bai, by: [0])
-        .join(INSERTION_SITES.out.filtered_abridged, by: [0])
-        .join(CHIMERIC_CONTIG_EVIDENCE_ANALYZER.out.evidence_counts, by: [0])
-        .join(INSERTION_SITES.out.gtf_extract, by: [0])
-        .join(INSERTION_SITES.out.fasta_extract, by: [0])
-        .join(INSERTION_SITES.out.genome_abundance_plot, by: [0])
-        .join(INSERTION_SITES.out.read_counts_image, by: [0])
-        .join(INSERTION_SITES.out.read_counts_log_image, by: [0])
-        .set { ch_summary_report }
-
-    SUMMARY_REPORT(
-        ch_summary_report,
+    CHIMERIC_READS (
+        VALIDATE.out.bam_bai,
+        INSERTION_SITES.out.gtf_extract,
+        INSERTION_SITES.out.fasta_extract,
+        INSERTION_SITES.out.filtered_abridged,
+        INSERTION_SITES.out.genome_abundance_plot,
+        INSERTION_SITES.out.read_counts_image,
+        INSERTION_SITES.out.read_counts_log_image,
         params.gtf,
         ch_igvjs_VIF
     )
-    ch_versions = ch_versions.mix(SUMMARY_REPORT.out.versions.first())
+    ch_versions = ch_versions.mix(CHIMERIC_READS.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

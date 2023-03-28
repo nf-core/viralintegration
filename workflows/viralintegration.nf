@@ -222,7 +222,7 @@ workflow VIRALINTEGRATION {
         .mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         .mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
         .mix(HOST.out.log_final.collect{it[1]}.ifEmpty([]))
-        //.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
+        .mix(HOST.out.mqc_log.collect{it[1]}.ifEmpty([]))
         .mix(PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
         .mix(VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
 

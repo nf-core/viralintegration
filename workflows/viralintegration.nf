@@ -108,6 +108,11 @@ workflow VIRALINTEGRATION {
         HOST.out.polya_trimmed,
         params.metaphlan_db
     )
+    ch_versions = ch_versions.mix(METAPHLAN3_METAPHLAN3.out.versions)
+
+    //
+    // MODULE: CAT viral and host reference fastas.
+    //
 
     CAT_FASTA (
         params.fasta,

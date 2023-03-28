@@ -55,7 +55,7 @@ workflow HOST {
     fastq = STAR_ALIGN_HOST.out.fastq
 
     trimmed_reads = TRIMMOMATIC.out.trimmed_reads
-    //mqc_log = TRIMMOMATIC.out.mqc_log
+    mqc_log = TRIMMOMATIC.out.mqc_log
 
     polya_trimmed = POLYA_STRIPPER.out.polya_trimmed
 

@@ -10,43 +10,74 @@ on:
 
 env:
   NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
 
 jobs:
   test:
-    name: Run pipeline with test data
+    name: nf-test ${{ matrix.profile }}-${{ matrix.NXF_VER }}
     # Only run on push if this is the nf-core dev branch (merged PRs)
     if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/viralintegration') }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Nextflow versions
-        include:
-          # Test pipeline minimum Nextflow version
-          - NXF_VER: "21.10.3"
-            NXF_EDGE: ""
-          # Test latest edge release of Nextflow
-          - NXF_VER: ""
-            NXF_EDGE: "1"
+        NXF_VER:
+          - "22.10.1"
+          - "latest-everything"
+        profile: ["docker"] # TODO , "singularity", "conda"]
     steps:
       - name: Check out pipeline code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Cache Nextflow installation
+        id: cache-software
+        uses: actions/cache@v3
+        with:
+          path: |
+            /usr/local/bin/nextflow
+            /usr/local/bin/nf-test
+            /home/runner/.nf-test/nf-test.jar
+          key: viralintegration-${{ runner.os }}-${{ matrix.NXF_VER }}
 
       - name: Install Nextflow
-        env:
-          NXF_VER: ${{ matrix.NXF_VER }}
-          # Uncomment only if the edge release is more recent than the latest stable release
-          # See https://github.com/nextflow-io/nextflow/issues/2467
-          # NXF_EDGE: ${{ matrix.NXF_EDGE }}
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
 
-      - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
-        # For example: adding multiple test runs with different parameters
-        # Remember that you can parallelise this by using strategy.matrix
+      - name: Install nf-test
+        if: steps.cache-software.outputs.cache-hit != 'true'
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+          wget -qO- https://code.askimed.com/install/nf-test | bash
+          sudo mv nf-test /usr/local/bin/
 
-#
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+
+      - name: Set up miniconda
+        if: matrix.profile == 'conda'
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          channels: conda-forge,bioconda,defaults
+          python-version: ${{ matrix.python-version }}
+
+      - name: Conda clean
+        if: matrix.profile == 'conda'
+        run: conda clean -a
+
+      - name: Run nf-test
+        run: |
+          nf-test test \
+            --profile=${{ matrix.profile }} \
+            tests/**/**/*.nf.test \
+            --tap=test.tap
+
+      - uses: pcolby/tap-summary@v1
+        with:
+          path: >-
+            test.tap

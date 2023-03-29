@@ -4,6 +4,7 @@
     nf-core/viralintegration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/viralintegration
+
     Website: https://nf-co.re/viralintegration
     Slack  : https://nfcore.slack.com/channels/viralintegration
 ----------------------------------------------------------------------------------------
@@ -18,6 +19,7 @@ nextflow.enable.dsl = 2
 */
 
 params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.gtf = WorkflowMain.getGenomeAttribute(params, 'gtf')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

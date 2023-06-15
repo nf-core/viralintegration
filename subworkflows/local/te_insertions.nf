@@ -6,7 +6,8 @@ include { SAMTOOLS_VIEW } from '../../modules/nf-core/samtools/view/main.nf'
 include { SAMTOOLS_FAIDX } from '../../modules/nf-core/samtools/faidx/main.nf'
 include { BEDTOOLS_CLOSEST} from '../../modules/nf-core/bedtools/closest/main.nf'
 include { BEDTOOLS_INTERSECT} from '../../modules/nf-core/bedtools/intersect/main.nf'
-include { BEDTOOLS_MERGE} from '../../modules/nf-core/bedtools/merge/main.nf'
+include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_P
+          BEDTOOLS_MERGE as BEDTOOLS_MERGE_M } from '../../modules/nf-core/bedtools/merge/main.nf'
 include { BEDTOOLS_BAMTOBED} from '../../modules/nf-core/bedtools/bamtobed/main.nf'
 include { PICARD_FILTERSAMREADS} from '../../modules/nf-core/picard/filtersamreads/main.nf'
 include { DISCORDANT_READ_IDS } from '../../modules/local/discordant_read_ids.nf'
@@ -52,24 +53,26 @@ workflow TE_INSERTIONS {
     )
     ch_versions = ch_versions.mix(PICARD_FILTERSAMREADS.out.versions.first())
 
-
-    // awk '{if ($4 > 3) print $0}' > ${currdir}/${line}_plusCluster.bed
-
-
     BEDTOOLS_BAMTOBED (
         PICARD_FILTERSAMREADS.out.bam
     )
     ch_versions = ch_versions.mix(BEDTOOLS_BAMTOBED.out.versions.first())
 
 
-    BEDTOOLS_MERGE (
+    BEDTOOLS_MERGE_P (
         BEDTOOLS_BAMTOBED.out.bed
     )
-    ch_versions = ch_versions.mix(BEDTOOLS_MERGE.out.versions.first())
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_P.out.versions.first())
 
-    // TODO two steps with plus and minus strand - do we need 2 bed files?
     // awk '{if ($4 > 3) print $0}' > ${currdir}/${line}_plusCluster.bed
+
+    BEDTOOLS_MERGE_M (
+        BEDTOOLS_BAMTOBED.out.bed
+    )
+    ch_versions = ch_versions.mix(BEDTOOLS_MERGE_M.out.versions.first())
+
     // awk '{if ($4 > 3) print $0}' > ${currdir}/${line}_minusCluster.bed
+
 
  // TODO make a channel for tupule for plus and minus
     // plusCluster.bed

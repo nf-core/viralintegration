@@ -10,7 +10,10 @@ include { BEDTOOLS_MERGE as BEDTOOLS_MERGE_P
           BEDTOOLS_MERGE as BEDTOOLS_MERGE_M } from '../../modules/nf-core/bedtools/merge/main.nf'
 include { BEDTOOLS_BAMTOBED} from '../../modules/nf-core/bedtools/bamtobed/main.nf'
 include { PICARD_FILTERSAMREADS} from '../../modules/nf-core/picard/filtersamreads/main.nf'
+
 include { DISCORDANT_READ_IDS } from '../../modules/local/discordant_read_ids.nf'
+include { PRIMARY_READS_MERGED_P } from '../../modules/local/primary_reads_merged_p.nf'
+include { PRIMARY_READS_MERGED_M } from '../../modules/local/primary_reads_merged_m.nf'
 
 
 workflow TE_INSERTIONS {
@@ -22,6 +25,9 @@ workflow TE_INSERTIONS {
 
     main:
     ch_versions = Channel.empty()
+
+    // TODO transform gtf into individual TE GFF - probably a local module if we have to use the gff
+    //  grep -P '[^(\w|\d|\-|\_|\#|\.)]'${line}'[^(\w|\d|\-|\_|\#|\.)]' $gtf > ${currdir}/${line}_TE.gff
 
     bam
         .join(te_gtf, by: [0], remainder: true)
@@ -44,6 +50,7 @@ workflow TE_INSERTIONS {
     )
     ch_versions = ch_versions.mix(DISCORDANT_READ_IDS.out.versions.first())
 
+    // TODO add conditional argument
     //if discordant readID file exists, then continue with remainder of TE analysis
     //then continue with following steps
 
@@ -64,20 +71,24 @@ workflow TE_INSERTIONS {
     )
     ch_versions = ch_versions.mix(BEDTOOLS_MERGE_P.out.versions.first())
 
-    // awk '{if ($4 > 3) print $0}' > ${currdir}/${line}_plusCluster.bed
+    PRIMARY_READS_MERGED_P (
+        BEDTOOLS_MERGE_P.out.bed
+    )
+    ch_versions = ch_versions.mix(PRIMARY_READS_MERGED_P.out.versions.first())
 
     BEDTOOLS_MERGE_M (
         BEDTOOLS_BAMTOBED.out.bed
     )
     ch_versions = ch_versions.mix(BEDTOOLS_MERGE_M.out.versions.first())
 
-    // awk '{if ($4 > 3) print $0}' > ${currdir}/${line}_minusCluster.bed
+    PRIMARY_READS_MERGED_M (
+        BEDTOOLS_MERGE_M.out.bed
+    )
+    ch_versions = ch_versions.mix(PRIMARY_READS_MERGED_M.out.versions.first())
 
-
- // TODO make a channel for tupule for plus and minus
-    // plusCluster.bed
-    //     .join(minusCluster.bed, by: [0], remainder: true)
-    //     .set { ch_plus_minus_bed }
+    PRIMARY_READS_MERGE_P.out.plus_cluster
+        .join(PRIMARY_READS_MERGE_M.out.minus_cluster, by: [0], remainder: true)
+        .set { ch_plus_minus_bed }
 
     SAMTOOLS_FAIDX(
         fasta,

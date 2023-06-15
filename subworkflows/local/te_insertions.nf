@@ -9,6 +9,7 @@ include { BEDTOOLS_INTERSECT} from '../../modules/nf-core/bedtools/intersect/mai
 include { BEDTOOLS_MERGE} from '../../modules/nf-core/bedtools/merge/main.nf'
 include { BEDTOOLS_BAMTOBED} from '../../modules/nf-core/bedtools/bamtobed/main.nf'
 include { PICARD_FILTERSAMREADS} from '../../modules/nf-core/picard/filtersamreads/main.nf'
+include { DISCORDANT_READ_IDS } from '../../modules/local/discordant_read_ids.nf'
 
 
 workflow TE_INSERTIONS {
@@ -37,13 +38,17 @@ workflow TE_INSERTIONS {
     )
     ch_versions = ch_versions.mix(SAMTOOLS_VIEW.out.versions.first())
 
-    //awk -v Ins=`expr $fis \* 10` '{if (($7 != "=") || ($9 > Ins) || ($9 < -Ins)) print $1}' > ${currdir}/${line}_ReadID.txt
+    DISCORDANT_READ_IDS (
+        SAMTOOLS_VIEW.out.bam
+    )
+    ch_versions = ch_versions.mix(DISCORDANT_READ_IDS.out.versions.first())
+
     //if discordant readID file exists, then continue with remainder of TE analysis
     //then continue with following steps
 
     PICARD_FILTERSAMREADS (
         SAMTOOLS_VIEW.out.bam,
-        readID.txt // TODO file should come from above "awk -v", figure out where/how to get it...
+        DISCORDANT_READ_IDS.out.read_ids
     )
     ch_versions = ch_versions.mix(PICARD_FILTERSAMREADS.out.versions.first())
 

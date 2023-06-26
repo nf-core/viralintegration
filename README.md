@@ -94,9 +94,9 @@ nextflow run nf-core/viralintegration \
 
 For more details, please refer to the [usage documentation](https://nf-co.re/viralintegration/usage) and the [parameter documentation](https://nf-co.re/viralintegration/parameters).
 
-   ```bash
-   nextflow run nf-core/viralintegration --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
-   ```
+```bash
+nextflow run nf-core/viralintegration --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+```
 
 ## Pipeline output
 

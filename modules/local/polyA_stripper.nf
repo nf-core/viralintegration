@@ -7,7 +7,7 @@ process POLYA_STRIPPER {
     if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
         exit 1, "Conda environments cannot be used when using the PolyA-stripper script. Please use docker or singularity containers."
     }
-    container "trinityctat/ctat_vif"
+    container "docker.io/trinityctat/ctat_vif"
 
     input:
     tuple val(meta), path(reads)

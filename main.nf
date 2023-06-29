@@ -4,7 +4,6 @@
     nf-core/viralintegration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/viralintegration
-
     Website: https://nf-co.re/viralintegration
     Slack  : https://nfcore.slack.com/channels/viralintegration
 ----------------------------------------------------------------------------------------

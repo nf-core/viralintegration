@@ -115,6 +115,10 @@ workflow VIRALINTEGRATION {
     )
     ch_versions = ch_versions.mix(CAT_FASTA.out.versions)
 
+    SAMTOOLS_SORT(
+        HOST.out.bam
+    )
+
     //
     // SUBWORKFLOW: Align filtered reads against combined host and te reference.
     //
@@ -122,7 +126,9 @@ workflow VIRALINTEGRATION {
     PLUS_TE (
         HOST.out.polya_trimmed,
         CAT_FASTA.out.plus_fasta,
-        params.gtf
+        params.gtf,
+        SAMTOOLS_SORT.out.bam,
+        HOST.out.host_junction
     )
     ch_versions = ch_versions.mix(PLUS_TE.out.versions)
 

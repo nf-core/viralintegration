@@ -48,6 +48,9 @@ workflow HOST {
     reads                  // channel: [ val(meta), [ reads ] ]
 
     index = ch_star_index
+    bam = STAR_ALIGN_HOST.out.bam
+    host_junction = STAR_ALIGN_HOST.out.junction
+
 
     log_final = STAR_ALIGN_PLUS.out.log_final
     log_out = STAR_ALIGN_PLUS.out.log_out

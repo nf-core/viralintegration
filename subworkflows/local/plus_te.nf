@@ -12,6 +12,8 @@ workflow PLUS_TE {
     reads // channel: [ val(meta), [ reads ] ]
     fasta // file: /path/to/fasta/
     gtf //   file: /path/to/gtf/
+    sam_bam // bam from HOST (need to use SAMTOOLS_SORT on HOST's bam before importing)
+    junction // chimeric junction from HOST
 
     main:
     ch_versions = Channel.empty()
@@ -38,36 +40,40 @@ workflow PLUS_TE {
     )
     ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
 
+    SAMTOOLS_MERGE(
+        SAMTOOLS_SORT.out.bam,
+        sam_bam
+    )
+
     SAMTOOLS_INDEX (
-        SAMTOOLS_SORT.out.bam
+        SAMTOOLS_MERGE.out.bam
     )
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
-    // TODO Concatenate files from HOST and PLUS
-    // bam, bai, junction, sam_bam
-    // Then join into channel
+    CAT_JUNCTION (
+        STAR_ALIGN_PLUS.out.junction,
+        junction
+    )
 
-    SAMTOOLS_SORT.out.bam
+    SAMTOOLS_MERGE.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(STAR_ALIGN_PLUS.out.junction)
+        .join(CAT_JUNCTION.out.junction)
         .set { ch_bam_bai_junction }
 
 
     emit:
     reads                  // channel: [ val(meta), [ reads ] ]
 
-    index = ch_star_index
-
-    // TODO Outputs will come from concatenation step
-    // bam = STAR_ALIGN_PLUS.out.bam
-    // junction = STAR_ALIGN_PLUS.out.junction
+    bam = STAR_ALIGN_PLUS.out.bam
+    plus_junction = STAR_ALIGN_PLUS.out.junction
+    junction = CAT_JUNCTION.out.junction
     log_final = STAR_ALIGN_PLUS.out.log_final
     log_out = STAR_ALIGN_PLUS.out.log_out
     log_progress = STAR_ALIGN_PLUS.out.log_progress
 
-    //sam_bam = SAMTOOLS_SORT.out.bam
+    sam_bam = SAMTOOLS_MERGE.out.bam
 
-    //bai = SAMTOOLS_INDEX.out.bai
+    bai = SAMTOOLS_INDEX.out.bai
 
     bam_bai_junction = ch_bam_bai_junction
 

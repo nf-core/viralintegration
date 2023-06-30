@@ -6,8 +6,6 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
-
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
@@ -51,6 +49,12 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 | `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
+
+## Options
+
+### Viral FASTA
+
+By default, the pipeline uses the [CTAT-VIF human virus database](https://github.com/broadinstitute/CTAT-VirusIntegrationFinder/wiki/Human-Virus-Database-Prep) to map the raw FastQ reads to the reference genomes. It can be any FASTA sequences of viral sequences of interest.
 
 ## Running the pipeline
 

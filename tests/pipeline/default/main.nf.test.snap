@@ -1,0 +1,16 @@
+{
+    "Should run without failures": {
+        "content": [
+            45,
+            "test_T1.vif.prelim.refined.tsv:md5,17b26b7a86d61206154ca3e2df02fc48",
+            "novirus_T1.VirusDetect.igvjs.bam:md5,1e9a7bb40b46057bc56e45cbe9c9cc62",
+            "novirus_T1.VirusDetect.sorted.igvjs.bam:md5,b8eaaee9fd4b5eae6c12e94e687023bb",
+            "redherring_T1.VirusDetect.igvjs.bam:md5,04cc667fb9c10aa3a702a04f20cb8b55",
+            "redherring_T1.VirusDetect.sorted.igvjs.bam:md5,ee759de8452a9c5eac2023080fff5c5b",
+            "test_T1.VirusDetect.igvjs.bam:md5,b059d6025142fc5f026cdd14e3da1f3e",
+            "test_T1.VirusDetect.sorted.igvjs.bam:md5,2828c5cfc68492b65150c697945a5e32",
+            "test_T1.VirusDetect.virus_read_counts_summary.tsv:md5,c051eb1a25e4741c43274589f75b80b6"
+        ],
+        "timestamp": "2023-02-24T15:20:28+0000"
+    }
+}

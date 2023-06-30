@@ -1,0 +1,30 @@
+Changes in module 'nf-core/trimmomatic'
+--- modules/nf-core/trimmomatic/main.nf
++++ modules/nf-core/trimmomatic/main.nf
+@@ -13,7 +13,8 @@
+     output:
+     tuple val(meta), path("*.paired.trim*.fastq.gz")   , emit: trimmed_reads
+     tuple val(meta), path("*.unpaired.trim_*.fastq.gz"), optional:true, emit: unpaired_reads
+-    tuple val(meta), path("*.log")                     , emit: log
++    tuple val(meta), path("*.trimmomatic.log")         , emit: trimlog
++    tuple val(meta), path("*.trim_out.log")            , emit: mqc_log
+     path "versions.yml"                                , emit: versions
+ 
+     when:
+@@ -32,11 +33,12 @@
+     trimmomatic \\
+         $trimmed \\
+         -threads $task.cpus \\
+-        -trimlog ${prefix}.log \\
++        -trimlog ${prefix}.trimmomatic.log \\
+         $reads \\
+         $output \\
+         $qual_trim \\
+-        $args
++        $args \\
++        2> ${prefix}.trim_out.log
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+
+************************************************************

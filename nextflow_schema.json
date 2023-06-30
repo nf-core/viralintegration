@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "viral_fasta", "outdir", "remove_duplicates", "min_reads", "max_hits"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -21,6 +21,15 @@
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/viralintegration/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "viral_fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.fasta",
+                    "description": "Path to fasta file with viral genomes",
+                    "fa_icon": "fas fa-viruses"
                 },
                 "outdir": {
                     "type": "string",
@@ -39,6 +48,26 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "min_reads": {
+                    "type": "integer",
+                    "default": 5,
+                    "description": "Minimum reads",
+                    "fa_icon": "far fa-minus-square",
+                    "minimum": 1
+                },
+                "max_hits": {
+                    "type": "integer",
+                    "default": 50,
+                    "description": "Maximum hits",
+                    "fa_icon": "fas fa-chess-queen",
+                    "minimum": 1
+                },
+                "remove_duplicates": {
+                    "type": "boolean",
+                    "default": "true",
+                    "description": "To remove duplicate viral hits or not",
+                    "fa_icon": "far fa-copy"
                 }
             }
         },
@@ -63,6 +92,15 @@
                     "description": "Path to FASTA genome file.",
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
+                },
+                "gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to GTF annotation file.",
+                    "fa_icon": "fas fa-code-branch",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified."
                 },
                 "igenomes_base": {
                     "type": "string",

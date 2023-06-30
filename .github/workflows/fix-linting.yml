@@ -25,7 +25,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.nf_core_bot_auth_token }}
 
       - uses: actions/setup-node@v3
-
       - name: Install Prettier
         run: npm install -g prettier @prettier/plugin-php
 

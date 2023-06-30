@@ -17,7 +17,7 @@ process CAT_JUNCTION {
 
     script:
     """
-    # remove header line from 1 of the junction files
+    sed -i '1d' $plus_chim_junction
 
     cat $host_chim_junction $plus_chim_junction > ${meta.id}_plus_chim.junction
 

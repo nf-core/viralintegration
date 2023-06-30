@@ -43,7 +43,8 @@ workflow PLUS_TE {
 
     SAMTOOLS_MERGE(
         SAMTOOLS_SORT.out.bam,
-        sam_bam
+        sam_bam,
+        []
     )
 
     SAMTOOLS_INDEX (
@@ -64,6 +65,8 @@ workflow PLUS_TE {
 
     emit:
     reads                  // channel: [ val(meta), [ reads ] ]
+
+    index = ch_star_index
 
     bam = STAR_ALIGN_PLUS.out.bam
     plus_junction = STAR_ALIGN_PLUS.out.junction

@@ -7,7 +7,7 @@
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
-WorkflowViralintegration.initialise(params, log)
+WorkflowChimericte.initialise(params, log)
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config, params.fasta, params.te_fasta ]
@@ -78,7 +78,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 // Info required for completion email and summary
 def multiqc_report = []
 
-workflow VIRALINTEGRATION {
+workflow CHIMERICTE {
 
     ch_versions = Channel.empty()
 
@@ -203,10 +203,10 @@ workflow VIRALINTEGRATION {
     //
     // MODULE: MultiQC
     //
-    workflow_summary    = WorkflowViralintegration.paramsSummaryMultiqc(workflow, summary_params)
+    workflow_summary    = WorkflowChimericte.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
-    methods_description    = WorkflowViralintegration.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
+    methods_description    = WorkflowChimericte.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
     ch_methods_description = Channel.value(methods_description)
 
     ch_multiqc_files = Channel.empty()

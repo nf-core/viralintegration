@@ -6,6 +6,7 @@ include { STAR_ALIGN as STAR_ALIGN_PLUS } from '../../modules/nf-core/star/align
 include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
+include { SAMTOOLS_MERGE } from '../../modules/nf-core/samtools/merge/main.nf'
 
 workflow PLUS_TE {
     take:

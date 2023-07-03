@@ -1,6 +1,6 @@
 process CAT_JUNCTION {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_medium'
 
     conda "conda-forge::sed=4.7"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -8,23 +8,18 @@ process CAT_JUNCTION {
         'ubuntu:20.04' }"
 
     input:
-    tuple val(meta), path (host_chim_junction), path (plus_chim_junction)
+    tuple val(meta), path (host_chim_junction)
+    tuple val(meta), path (plus_chim_junction)
 
     output:
-    tuple val(meta), path '*_chim.junction', emit: plus_chim_junction
-    path "versions.yml"        , emit: versions
+    tuple val(meta), path ("*_chim.junction") , emit: chim_junction
+    path "versions.yml"                       , emit: versions
 
     script:
-    def junction_file = "${meta.id}.*.Chimeric.out.junction"
-    def line_num = "(cat ${junction_file} | wc -l)"
     """
-    if ${line_num} > 1; then
+    sed -i '1d' $plus_chim_junction
 
-        sed -i '1d' ${meta.id}plus_chim_junction
-
-        cat ${meta.id}host_chim_junction ${meta.id}plus_chim_junction > ${meta.id}_chim.junction
-
-    fi
+    cat $host_chim_junction $plus_chim_junction > ${meta.id}_chim.junction
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

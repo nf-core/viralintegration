@@ -7,6 +7,7 @@ include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
 include { SAMTOOLS_MERGE } from '../../modules/nf-core/samtools/merge/main.nf'
+include { CAT_JUNCTION } from '../../modules/local/cat_junction.nf'
 
 workflow PLUS_TE {
     take:
@@ -41,10 +42,13 @@ workflow PLUS_TE {
     )
     ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
 
+    SAMTOOLS_SORT.out.bam
+        .join(sam_bam, by: [0], remainder: true)
+        .set { ch_SAMTOOLS_MERGE_in_bams }
+
     SAMTOOLS_MERGE(
-        SAMTOOLS_SORT.out.bam,
-        sam_bam,
-        []
+        ch_SAMTOOLS_MERGE_in_bams,
+        fasta
     )
 
     SAMTOOLS_INDEX (
@@ -59,7 +63,7 @@ workflow PLUS_TE {
 
     SAMTOOLS_MERGE.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(CAT_JUNCTION.out.junction)
+        .join(CAT_JUNCTION.out.chim_junction)
         .set { ch_bam_bai_junction }
 
 
@@ -70,7 +74,7 @@ workflow PLUS_TE {
 
     bam = STAR_ALIGN_PLUS.out.bam
     plus_junction = STAR_ALIGN_PLUS.out.junction
-    junction = CAT_JUNCTION.out.junction
+    chim_junction = CAT_JUNCTION.out.chim_junction
     log_final = STAR_ALIGN_PLUS.out.log_final
     log_out = STAR_ALIGN_PLUS.out.log_out
     log_progress = STAR_ALIGN_PLUS.out.log_progress

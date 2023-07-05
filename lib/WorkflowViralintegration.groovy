@@ -53,13 +53,14 @@ class WorkflowViralintegration {
 
     public static String toolCitationText(params) {
 
-        // TODO Optionally add in-text citation tools to this list.
-        // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
-        // Uncomment function in methodsDescriptionText to render in MultiQC report
         def citation_text = [
                 "Tools used in the workflow included:",
                 "FastQC (Andrews 2010),",
                 "MultiQC (Ewels et al. 2016)",
+                "IGV (Robinson et al. 2011)",
+                "SAMtools (Li et al. 2009)",
+                "STAR (Dobin et al. 2013)",
+                "Trimmomatic (Bolger et al. 2014)",
                 "."
             ].join(' ').trim()
 
@@ -68,12 +69,13 @@ class WorkflowViralintegration {
 
     public static String toolBibliographyText(params) {
 
-        // TODO Optionally add bibliographic entries to this list.
-        // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
-        // Uncomment function in methodsDescriptionText to render in MultiQC report
         def reference_text = [
                 "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
-                "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
+                "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>",
+                "<li>Robinson JT, Thorvaldsdóttir H, Winckler W, Guttman M, Lander ES, Getz G, Mesirov JP. (2011) Integrative genomics viewer. Nat Biotechnol. 29(1):24-6. doi: 10.1038/nbt.1754</li>",
+                "<li>Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R; 1000 Genome Project Data Processing Subgroup. (2009) The Sequence Alignment/Map format and SAMtools. Bioinformatics. 25(16):2078-9. doi: 10.1093/bioinformatics/btp352</li>",
+                "<li>Dobin A, Davis CA, Schlesinger F, Drenkow J, Zaleski C, Jha S, Batut P, Chaisson M, Gingeras TR. (2013) STAR: ultrafast universal RNA-seq aligner. Bioinformatics. 29(1):15-21. doi: 10.1093/bioinformatics/bts635</li>",
+                "<li>Bolger AM, Lohse M, Usadel B. (2014) Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics. 30(15):2114-20. doi: 10.1093/bioinformatics/btu170</li>"
             ].join(' ').trim()
 
         return reference_text
@@ -93,9 +95,8 @@ class WorkflowViralintegration {
         meta["tool_citations"] = ""
         meta["tool_bibliography"] = ""
 
-        // TODO Only uncomment below if logic in toolCitationText/toolBibliographyText has been filled!
-        //meta["tool_citations"] = toolCitationText(params).replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
-        //meta["tool_bibliography"] = toolBibliographyText(params)
+        meta["tool_citations"] = toolCitationText(params).replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
+        meta["tool_bibliography"] = toolBibliographyText(params)
 
 
         def methods_text = mqc_methods_yaml.text

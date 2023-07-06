@@ -4,7 +4,8 @@
 
 include { STAR_ALIGN as STAR_ALIGN_PLUS } from '../../modules/nf-core/star/align/main.nf'
 include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
-include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
+include { SAMTOOLS_SORT as SAMTOOLS_SORT
+                        as SAMTOOLS_SORT_2 } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
 include { SAMTOOLS_MERGE } from '../../modules/nf-core/samtools/merge/main.nf'
 include { CAT_JUNCTION } from '../../modules/local/cat_junction.nf'
@@ -51,8 +52,13 @@ workflow PLUS_TE {
         fasta
     )
 
-    SAMTOOLS_INDEX (
+    SAMTOOLS_SORT_2 (
         SAMTOOLS_MERGE.out.bam
+    )
+    ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
+
+    SAMTOOLS_INDEX (
+        SAMTOOLS_SORT_2.out.bam
     )
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
@@ -79,7 +85,7 @@ workflow PLUS_TE {
     log_out = STAR_ALIGN_PLUS.out.log_out
     log_progress = STAR_ALIGN_PLUS.out.log_progress
 
-    sam_bam = SAMTOOLS_MERGE.out.bam
+    sam_bam = SAMTOOLS_INDEX_2.out.bam
 
     bai = SAMTOOLS_INDEX.out.bai
 

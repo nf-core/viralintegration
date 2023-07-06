@@ -140,7 +140,7 @@ workflow CHIMERICTE {
     INSERTION_SITES (
         PLUS_TE.out.bam_bai_junction,
         params.fasta,
-        params.te_fasta,
+        params.large_fasta,
         PLUS_TE.out.sam_bam,
         PLUS_TE.out.bai,
         ch_igvjs_VIF

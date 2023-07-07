@@ -64,8 +64,7 @@ include { VALIDATE } from '../subworkflows/local/validate'
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { SAMTOOLS_SORT as SAMTOOLS_SORT
-          SAMTOOLS_SORT as SAMTOOLS_SORT_DUPLICATES } from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_SORT as SAMTOOLS_SORT_DUPLICATES } from '../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_DUPLICATES } from '../modules/nf-core/samtools/index/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
@@ -116,10 +115,6 @@ workflow CHIMERICTE {
     )
     ch_versions = ch_versions.mix(CAT_FASTA.out.versions)
 
-    SAMTOOLS_SORT(
-        HOST.out.bam
-    )
-
     //
     // SUBWORKFLOW: Align filtered reads against combined host and te reference.
     //
@@ -128,7 +123,7 @@ workflow CHIMERICTE {
         HOST.out.polya_trimmed,
         CAT_FASTA.out.plus_fasta,
         params.gtf,
-        SAMTOOLS_SORT.out.bam,
+        HOST.out.bam,
         HOST.out.host_junction
     )
     ch_versions = ch_versions.mix(PLUS_TE.out.versions)

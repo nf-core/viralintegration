@@ -61,7 +61,7 @@ workflow PLUS_TE {
         junction
     )
 
-    SAMTOOLS_MERGE.out.bam
+    SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
         .join(CAT_JUNCTION.out.chim_junction)
         .set { ch_bam_bai_junction }

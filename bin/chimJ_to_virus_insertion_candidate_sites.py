@@ -193,7 +193,7 @@ def main():
     # Check to see if chrA or chrB are in viral data base
     # ~~~~~~~~~~~~~~~~~~~~~~~~~
     logger.info("-filtering out human--human chimeric entries")
-    df = df[(df["chr_donorA"].isin(viral_db_entries)) ^ (df["chr_acceptorB"].isin(viral_db_entries))]
+    df = df[(df["chr_donorA"].isin(viral_db_entries)) | (df["chr_acceptorB"].isin(viral_db_entries))]
 
     logger.info(f"Chimeric insertions involving viruses and human: {df.shape[0]}")
 

@@ -45,6 +45,7 @@ workflow PLUS_TE {
         ch_SAMTOOLS_MERGE_in_bams,
         fasta
     )
+    ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
 
     SAMTOOLS_SORT (
         SAMTOOLS_MERGE.out.bam
@@ -60,6 +61,7 @@ workflow PLUS_TE {
         STAR_ALIGN_PLUS.out.junction,
         junction
     )
+    ch_versions = ch_versions.mix(CAT_JUNCTION.out.versions.first())
 
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)

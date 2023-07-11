@@ -37,8 +37,8 @@ workflow PLUS_TE {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
 
-    STAR_ALIGN_PLUS.out.bam
-        .join(bam, by: [0], remainder: true)
+    bam
+        .join(STAR_ALIGN_PLUS.out.bam, by: [0], remainder: true)
         .set { ch_SAMTOOLS_MERGE_in_bams }
 
     SAMTOOLS_MERGE(

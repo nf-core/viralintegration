@@ -25,10 +25,10 @@ process SUMMARY_REPORT {
 
     output:
     tuple val(meta), path ("*.html")                       , emit: html
-    tuple val(meta), path ("*.prelim.refined.tsv")         , emit: prelim_refined_counts
-    tuple val(meta), path ("*.refined.tsv")                , emit: refined_counts
+    //tuple val(meta), path ("*.prelim.refined.tsv")         , emit: prelim_refined_counts
+    //tuple val(meta), path ("*.refined.tsv")                , emit: refined_counts
     tuple val(meta), path ("*.refined.wRefGeneAnnots.tsv") , emit: refined_counts_w_genes
-    tuple val(meta), path ("*.refined.distilled.tsv")      , emit: refined_distilled
+    //tuple val(meta), path ("*.refined.distilled.tsv")      , emit: refined_distilled
     tuple val(meta), path ("*.genome_plot.png")            , emit: genome_abundance_plot
     path "versions.yml"                                    , emit: versions
 
@@ -42,27 +42,28 @@ process SUMMARY_REPORT {
     def max_coverage = 100
     def prefix = task.ext.prefix ?: "${meta.id}.vif"
     """
-    refine_VIF_output.R \\
-        --prelim_counts ${init_counts} \\
-        --vif_counts ${vif_counts} \\
-        --output ${prefix}.prelim.refined.tsv
+    # HACK: This is a hack to get around the refining TSV steps
+    #refine_VIF_output.R \\
+    #   --prelim_counts ${init_counts} \\
+    #  --vif_counts ${vif_counts} \\
+    # --output ${prefix}.prelim.refined.tsv
 
-    examine_flanking_uniq_kmer_composition.py \\
-        --vif_tsv ${prefix}.prelim.refined.tsv \\
-        --min_frac_uniq ${min_flank_frac_uniq} \\
-        --output ${prefix}.refined.tsv
+    #examine_flanking_uniq_kmer_composition.py \\
+    #   --vif_tsv ${prefix}.prelim.refined.tsv \\
+    #  --min_frac_uniq ${min_flank_frac_uniq} \\
+    # --output ${prefix}.refined.tsv
 
-    distill_to_primary_target_list_via_brkpt_homologies.py \\
-        --vif_tsv ${prefix}.refined.tsv \\
-        > ${prefix}.refined.distilled.tsv
+    #distill_to_primary_target_list_via_brkpt_homologies.py \\
+    #   --vif_tsv ${prefix}.refined.tsv \\
+    #  > ${prefix}.refined.distilled.tsv
 
     make_VIF_genome_abundance_plot.R \\
-        --vif_report ${prefix}.refined.tsv \\
+        --vif_report ${init_counts} \\
         --title "Genome Wide Abundance" \\
         --output_png ${prefix}.genome_plot.png
 
     find_closest.py \\
-        -i ${prefix}.refined.tsv \\
+        -i ${init_counts} \\
         -o ${prefix}.refined.wRefGeneAnnots.tsv \\
         --gtf ${gtf}
 

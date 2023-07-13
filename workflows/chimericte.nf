@@ -48,7 +48,7 @@ include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { HOST        } from '../subworkflows/local/host'
+include { HOST_TE        } from '../subworkflows/local/host_te'
 include { PLUS_TE        } from '../subworkflows/local/plus_te'
 include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
 include { VALIDATE } from '../subworkflows/local/validate'
@@ -102,12 +102,12 @@ workflow CHIMERICTE {
     // SUBWORKFLOW: Align input reads against host genome.
     //
 
-    HOST (
+    HOST_TE (
         INPUT_CHECK.out.reads,
         params.fasta,
         params.gtf
     )
-    ch_versions = ch_versions.mix(HOST.out.versions)
+    ch_versions = ch_versions.mix(HOST_TE.out.versions)
 
     CAT_FASTA (
         params.fasta,
@@ -120,11 +120,9 @@ workflow CHIMERICTE {
     //
 
     PLUS_TE (
-        HOST.out.polya_trimmed,
+        HOST_TE.out.polya_trimmed,
         CAT_FASTA.out.plus_fasta,
         params.gtf,
-        HOST.out.bam,
-        HOST.out.host_junction
     )
     ch_versions = ch_versions.mix(PLUS_TE.out.versions)
 
@@ -135,8 +133,8 @@ workflow CHIMERICTE {
     INSERTION_SITES (
         PLUS_TE.out.bam_bai_junction,
         params.fasta,
-        params.large_fasta,
-        PLUS_TE.out.sam_bam,
+        params.te_fasta,
+        PLUS_TE.out.bam,
         PLUS_TE.out.bai,
         ch_igvjs_VIF
     )
@@ -210,7 +208,7 @@ workflow CHIMERICTE {
         .mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
         .mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         .mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-        .mix(HOST.out.log_final.collect{it[1]}.ifEmpty([]))
+        // .mix(HOST_TE.out.log_final.collect{it[1]}.ifEmpty([]))
         //.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
         .mix(PLUS_TE.out.log_final.collect{it[1]}.ifEmpty([]))
         .mix(VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))

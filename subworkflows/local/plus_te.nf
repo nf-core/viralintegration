@@ -6,16 +6,12 @@ include { STAR_ALIGN as STAR_ALIGN_PLUS } from '../../modules/nf-core/star/align
 include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/main.nf'
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
-include { SAMTOOLS_MERGE } from '../../modules/nf-core/samtools/merge/main.nf'
-include { CAT_JUNCTION } from '../../modules/local/cat_junction.nf'
 
 workflow PLUS_TE {
     take:
     reads // channel: [ val(meta), [ reads ] ]
     fasta // file: /path/to/fasta/
     gtf //   file: /path/to/gtf/
-    bam // bam from HOST
-    junction // chimeric junction from HOST
 
     main:
     ch_versions = Channel.empty()
@@ -37,18 +33,8 @@ workflow PLUS_TE {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN_PLUS.out.versions.first())
 
-    bam
-        .join(STAR_ALIGN_PLUS.out.bam, by: [0], remainder: true)
-        .set { ch_SAMTOOLS_MERGE_in_bams }
-
-    SAMTOOLS_MERGE(
-        ch_SAMTOOLS_MERGE_in_bams,
-        fasta
-    )
-    ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
-
     SAMTOOLS_SORT (
-        SAMTOOLS_MERGE.out.bam
+        STAR_ALIGN_PLUS.out.bam
     )
     ch_versions = ch_versions.mix(SAMTOOLS_SORT.out.versions.first())
 
@@ -57,15 +43,9 @@ workflow PLUS_TE {
     )
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
-    CAT_JUNCTION (
-        STAR_ALIGN_PLUS.out.junction,
-        junction
-    )
-    ch_versions = ch_versions.mix(CAT_JUNCTION.out.versions.first())
-
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
-        .join(CAT_JUNCTION.out.chim_junction)
+        .join(STAR_ALIGN_PLUS.out.junction)
         .set { ch_bam_bai_junction }
 
 
@@ -75,13 +55,11 @@ workflow PLUS_TE {
     index = ch_star_index
 
     plus_junction = STAR_ALIGN_PLUS.out.junction
-    chim_junction = CAT_JUNCTION.out.chim_junction
     log_final = STAR_ALIGN_PLUS.out.log_final
     log_out = STAR_ALIGN_PLUS.out.log_out
     log_progress = STAR_ALIGN_PLUS.out.log_progress
 
-    sam_bam = SAMTOOLS_MERGE.out.bam
-
+    bam = SAMTOOLS_SORT.out.bam
     bai = SAMTOOLS_INDEX.out.bai
 
     bam_bai_junction = ch_bam_bai_junction

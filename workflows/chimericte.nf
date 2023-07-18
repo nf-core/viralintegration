@@ -103,9 +103,7 @@ workflow CHIMERICTE {
     //
 
     HOST_TE (
-        INPUT_CHECK.out.reads,
-        params.fasta,
-        params.gtf
+        INPUT_CHECK.out.reads
     )
     ch_versions = ch_versions.mix(HOST_TE.out.versions)
 

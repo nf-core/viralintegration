@@ -78,200 +78,215 @@
       </div>
     </div>
     <script type="text/javascript">
-        <!-- start igv report here -->
+      <!-- start igv report here -->
 
-        "use strict;";
-        var fusionInspectorState = {
-          cache: {
-            tabs: [],
-            json: tableJson,
-          },
-          browserMade: false,
-        };
+      "use strict;";
+      var fusionInspectorState = {
+        cache: {
+          tabs: [],
+          json: tableJson,
+        },
+        browserMade: false,
+      };
 
-        $(document).ready(function () {
-          loadFusionDataTable();
+      $(document).ready(function () {
+        loadFusionDataTable();
 
-          fusionInspectorState.cache.fusionTable = $("#fusionTable").DataTable({
-            order: [[1, "desc"]],
-            scrollX: true,
-          });
+        fusionInspectorState.cache.fusionTable = $("#fusionTable").DataTable({
+          order: [[1, "desc"]],
+          scrollX: true,
+        });
 
-          $("#fusionTable tbody").on("click", "tr", function () {
-            curFusionRow = fusionInspectorState.cache.fusionTable.row(this).data();
-            // IGV browser has to be visible when the files are loaded.
-            // If it is hidden the files load as 200 (full file) as opposed
-            // to 206, whichis needed for indexed reading as igv web needs it.
-            loadIGVBrowser(
-              getFusionAnnotationFromRow(igvSearchKey, curFusionRow)
-              // getFusionAnnotationFromRow('split', curFusionRow),
-              // getFusionAnnotationFromRow('span', curFusionRow)
-            ); //loadIGVBrowser
-          }); //#fusionTable
+        $("#fusionTable tbody").on("click", "tr", function () {
+          curFusionRow = fusionInspectorState.cache.fusionTable.row(this).data();
+          // IGV browser has to be visible when the files are loaded.
+          // If it is hidden the files load as 200 (full file) as opposed
+          // to 206, whichis needed for indexed reading as igv web needs it.
+          loadIGVBrowser(
+            getFusionAnnotationFromRow(igvSearchKey, curFusionRow)
+            // getFusionAnnotationFromRow('split', curFusionRow),
+            // getFusionAnnotationFromRow('span', curFusionRow)
+          ); //loadIGVBrowser
+        }); //#fusionTable
 
-          // This hooks into the event fired off by tabs being selected.
-          // It forces a redraw of the tab. Because the data table is originally
-          // draw in a hidden (height = 0) div, the table is misdrawn. You have to
-          // Trigger a redraw when the tab is visible so the height of the data table
-          // can be correctly calculated.
-          // Thanks to //stackoverflow.com/questions/20705905/bootstrap-3-jquery-event-for-active-tab-change
-          $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
-            $("#fusionTable").DataTable().columns.adjust().draw();
-          });
-        }); //JSON read
+        // This hooks into the event fired off by tabs being selected.
+        // It forces a redraw of the tab. Because the data table is originally
+        // draw in a hidden (height = 0) div, the table is misdrawn. You have to
+        // Trigger a redraw when the tab is visible so the height of the data table
+        // can be correctly calculated.
+        // Thanks to //stackoverflow.com/questions/20705905/bootstrap-3-jquery-event-for-active-tab-change
+        $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+          $("#fusionTable").DataTable().columns.adjust().draw();
+        });
+      }); //JSON read
 
-        function loadIGVBrowser(curFusion, curJunctionReads, curSpanningReads) {
-          // Update header no matter if the browser is being made.
-          //setFusionDetails(curFusion, curJunctionReads, curSpanningReads); //diabled because requires callback from igv browser when fusion is changed from there.
+      function loadIGVBrowser(curFusion, curJunctionReads, curSpanningReads) {
+        // Update header no matter if the browser is being made.
+        //setFusionDetails(curFusion, curJunctionReads, curSpanningReads); //diabled because requires callback from igv browser when fusion is changed from there.
 
-          // Do not remake browser.
-          if (!fusionInspectorState.cache["curBrowser"]) {
-            // Add and show tab for IGV
-            $("#tabDescription").append(
-              '<li role="presentation" id="igvTab"><a href="#igvBrowser" data-toggle="tab">IGV Detail</a></li>'
-            );
-            $("#tabContent").append('<div role="tabpanel" id="igvBrowser" class="tab-pane"></div>');
+        // Do not remake browser.
+        if (!fusionInspectorState.cache["curBrowser"]) {
+          // Add and show tab for IGV
+          $("#tabDescription").append(
+            '<li role="presentation" id="igvTab"><a href="#igvBrowser" data-toggle="tab">IGV Detail</a></li>'
+          );
+          $("#tabContent").append('<div role="tabpanel" id="igvBrowser" class="tab-pane"></div>');
 
-            $('.nav-tabs a[href="#igvBrowser"]').tab("show");
-
-            makeIGVBrowser(curFusion).then(function (browser) {
-              fusionInspectorState.cache["curBrowser"] = browser;
-              igv.visibilityChange();
-            });
-          } else {
-            goToFusion(curFusion);
-          }
-        }
-
-        /**
-        * Return a promise to make an igv browser.
-        *
-        * @param initialFusion
-        * @returns {*}
-        */
-        function makeIGVBrowser(initialFusion) {
-          var divBrowser = $("#igvBrowser")[0],
-            options = {
-              showChromosomeWidget: true,
-              showNavigation: true,
-              showKaryo: false,
-              locus: initialFusion,
-              reference: {
-                fastaURL: "__PREFIX__.fa",
-              },
-              tracks: [
-                {
-                  type: "sequence",
-                  order: 1,
-                },
-
-                {
-                  label: "ref_annot",
-                  url: "__PREFIX__.bed",
-                  displayMode: "EXPANDED",
-                  indexed: false,
-                  order: 10,
-                  type: "annotation",
-                  format: "bed",
-                },
-
-                {
-                  url: "__PREFIX__.reads.bam",
-                  label: "Junction_Reads_Alignments",
-                  type: "bam",
-                  height: 400,
-                  indexed: true,
-                  viewAsPairs: true,
-                  visibilityWindow: 2000000,
-                  order: 45,
-                },
-              ],
-            };
-
-          return igv.createBrowser(divBrowser, options);
-        }
-
-        function goToFusion(fusionChr) {
-          //, fusionBreakRight, fusionBreakLeft ){
-
-          var location = fusionChr;
-          console.log("searching on location");
-          console.log(location);
           $('.nav-tabs a[href="#igvBrowser"]').tab("show");
-          fusionInspectorState.cache.curBrowser.search(location).then(function (ignore) {
+
+          makeIGVBrowser(curFusion).then(function (browser) {
+            fusionInspectorState.cache["curBrowser"] = browser;
             igv.visibilityChange();
           });
+        } else {
+          goToFusion(curFusion);
+        }
+      }
+
+      /**
+       * Return a promise to make an igv browser.
+       *
+       * @param initialFusion
+       * @returns {*}
+       */
+      function makeIGVBrowser(initialFusion) {
+        var divBrowser = $("#igvBrowser")[0],
+          options = {
+            showChromosomeWidget: true,
+            showNavigation: true,
+            showKaryo: false,
+            locus: initialFusion,
+            reference: {
+              fastaURL: "__PREFIX__.fa",
+            },
+            tracks: [
+              {
+                type: "sequence",
+                order: 1,
+              },
+
+              {
+                label: "ref_annot",
+                url: "__PREFIX__.bed",
+                displayMode: "EXPANDED",
+                indexed: false,
+                order: 10,
+                type: "annotation",
+                format: "bed",
+              },
+
+              {
+                url: "__PREFIX__.reads.bam",
+                label: "Junction_Reads_Alignments",
+                type: "bam",
+                height: 400,
+                indexed: true,
+                viewAsPairs: true,
+                visibilityWindow: 2000000,
+                order: 45,
+              },
+            ],
+          };
+
+        return igv.createBrowser(divBrowser, options);
+      }
+
+      function goToFusion(fusionChr) {
+        //, fusionBreakRight, fusionBreakLeft ){
+
+        var location = fusionChr;
+        console.log("searching on location");
+        console.log(location);
+        $('.nav-tabs a[href="#igvBrowser"]').tab("show");
+        fusionInspectorState.cache.curBrowser.search(location).then(function (ignore) {
+          igv.visibilityChange();
+        });
+      }
+
+      function setFusionDetails(fusionName, fusionJunctReads, fusionSpanFrags) {
+        // diabling for now - need igv callback
+        // $("#FusionNameDetail").html("<p class='navbar-text'><b>Fusion Name:</b> " + fusionName + "</p>");
+        // $("#FusionJunctionDetail").html("<p class='navbar-text'><b>Junction Read Count:</b> " + fusionJunctReads + "</p>");
+        // $("#FusionSpanningDetail").html("<p class='navbar-text'><b>Spanning Read Count:</b> " + fusionSpanFrags + "</p>");
+      }
+
+      function toTableBodyElement(fusionEntry, orderedHeaderKeys) {
+        var bodyRow = "<tr>";
+        for (var headerKeyIndex = 0; headerKeyIndex < orderedHeaderKeys.length; headerKeyIndex++) {
+          bodyRow = bodyRow + "<td>" + fusionEntry[orderedHeaderKeys[headerKeyIndex]] + "</td>";
+        }
+        return bodyRow + "</tr>";
+      }
+
+      function getFusionAnnotationFromRow(infoHeader, dataRow) {
+        var index = fusionInspectorState.cache.fusionKeys.indexOf(infoHeader);
+        if (index == -1) {
+          return undefined;
+        }
+        return dataRow[index];
+      }
+
+      var igvSearchKey;
+
+      function loadFusionDataTable() {
+        var headerColumnOrder = [
+          "contig",
+          "split",
+          "span",
+          "total",
+          "chrA",
+          "coordA",
+          "orientA",
+          "chrB",
+          "coordB",
+          "orientB",
+        ];
+        var virusHeaderColumnOrder = ["virus", "chim_reads", "mapped", "seqlen"];
+        headerColumnOrder = headerColumnOrder.concat(virusHeaderColumnOrder);
+        var nameToIndex = {};
+        for (var i = 0; i < headerColumnOrder.length; i++) {
+          nameToIndex[headerColumnOrder[i]] = i;
+        }
+        var fusionKeys = Object.keys(fusionInspectorState.cache.json.fusions[0]);
+        fusionKeys.sort((a, b) => {
+          var aIndex = nameToIndex[a];
+          var bIndex = nameToIndex[b];
+          if (aIndex !== undefined && bIndex !== undefined) {
+            return aIndex - bIndex;
+          }
+          if (aIndex !== undefined) {
+            return -1;
+          }
+          if (bIndex !== undefined) {
+            return 1;
+          }
+
+          a = a.toLowerCase();
+          b = b.toLowerCase();
+          return a - b;
+        });
+        igvSearchKey = fusionKeys.indexOf("contig") !== -1 ? "contig" : "virus";
+
+        // Make data table header and footer
+        var fusionTable = $("#fusionTable");
+        var fusionHeader = [];
+        for (var header = 0; header < fusionKeys.length; header++) {
+          fusionHeader.push("<th>" + fusionKeys[header] + "</th>");
         }
 
-        function setFusionDetails(fusionName, fusionJunctReads, fusionSpanFrags) {
-          // diabling for now - need igv callback
-          // $("#FusionNameDetail").html("<p class='navbar-text'><b>Fusion Name:</b> " + fusionName + "</p>");
-          // $("#FusionJunctionDetail").html("<p class='navbar-text'><b>Junction Read Count:</b> " + fusionJunctReads + "</p>");
-          // $("#FusionSpanningDetail").html("<p class='navbar-text'><b>Spanning Read Count:</b> " + fusionSpanFrags + "</p>");
+        fusionTable.append("<thead><tr>" + fusionHeader.join("") + "</tr></thead>");
+        fusionTable.append("<tfoot><tr>" + fusionHeader.join("") + "</tr></tfoot>");
+
+        fusionInspectorState.cache["fusionKeys"] = fusionKeys; //orderTableKeysBeginning(forcedHeaderKeyOrder, fusionKeys);
+
+        // Add data table body (in order of forced fusion header)
+        fusionTable.append("<tbody>");
+        for (var fusionIndex = 0; fusionIndex < fusionInspectorState.cache.json.fusions.length; fusionIndex++) {
+          var fusionEntry = fusionInspectorState.cache.json.fusions[fusionIndex];
+          fusionTable.append(toTableBodyElement(fusionEntry, fusionKeys));
         }
-
-        function toTableBodyElement(fusionEntry, orderedHeaderKeys) {
-          var bodyRow = "<tr>";
-          for (var headerKeyIndex = 0; headerKeyIndex < orderedHeaderKeys.length; headerKeyIndex++) {
-            bodyRow = bodyRow + "<td>"
-            + fusionEntry[orderedHeaderKeys[headerKeyIndex]] + "</td>";
-          } return bodyRow + "</tr>";
-        } function
-          getFusionAnnotationFromRow(infoHeader, dataRow) {
-            var
-            index = fusionInspectorState.cache.fusionKeys.indexOf(infoHeader); if (index == -1) { return undefined; } return
-          dataRow[index];
-        } var igvSearchKey; function loadFusionDataTable() {
-          var headerColumnOrder = ["contig", "split"
-            , "span", "total", "chrA", "coordA", "orientA", "chrB", "coordB", "orientB",]; var
-              virusHeaderColumnOrder = ["virus", "chim_reads", "mapped", "seqlen"];
-          headerColumnOrder = headerColumnOrder.concat(virusHeaderColumnOrder); var nameToIndex = {}; for (var i = 0; i <
-            headerColumnOrder.length; i++) { nameToIndex[headerColumnOrder[i]] = i; } var
-              fusionKeys = Object.keys(fusionInspectorState.cache.json.fusions[0]); fusionKeys.sort((a, b) => {
-                var aIndex = nameToIndex[a];
-                var bIndex = nameToIndex[b];
-                if (aIndex !== undefined && bIndex !== undefined) {
-                  return aIndex - bIndex;
-                }
-                if (aIndex !== undefined) {
-                  return -1;
-                }
-                if (bIndex !== undefined) {
-                  return 1;
-                }
-
-                a = a.toLowerCase();
-                b = b.toLowerCase();
-                return a - b;
-              });
-          igvSearchKey = fusionKeys.indexOf("contig") !== -1 ? "contig" : "virus";
-
-          // Make data table header and footer
-          var fusionTable = $("#fusionTable");
-          var fusionHeader = [];
-          for (var header = 0; header < fusionKeys.length; header++) {
-            fusionHeader.push("<th>" + fusionKeys[header] + "
-            </th > ");
-            }
-
-          fusionTable.append("<thead>
-            < tr > " + fusionHeader.join("") + "</tr >
-      </thead > ");
-      fusionTable.append("<tfoot>
-              < tr > " + fusionHeader.join("") + "</tr >
-      </tfoot > ");
-
-      fusionInspectorState.cache["fusionKeys"] = fusionKeys; //orderTableKeysBeginning(forcedHeaderKeyOrder,
-      fusionKeys);
-
-          // Add data table body (in order of forced fusion header)
-          fusionTable.append("<tbody>");
-          for (var fusionIndex = 0; fusionIndex < fusionInspectorState.cache.json.fusions.length; fusionIndex++) {
-            var
-            fusionEntry = fusionInspectorState.cache.json.fusions[fusionIndex];
-            fusionTable.append(toTableBodyElement(fusionEntry, fusionKeys));
-          } fusionTable.append("</tbody>");
-        }
+        fusionTable.append("</tbody>");
+      }
     </script>
   </body>
 </html>

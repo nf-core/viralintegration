@@ -21,7 +21,7 @@ process POLYA_STRIPPER {
     fastq_polyA_stripper.py \\
         --out_prefix ${meta.id} \\
         --left_fq ${reads[0]} \\
-        --right_fq ${reads[1]}
+    ### --right_fq ${reads[1]} # HACK for single end reads, TODO make this input optional
 
     pigz *.polyA-trimmed.fastq
 

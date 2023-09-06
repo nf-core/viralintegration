@@ -107,12 +107,12 @@ def write_genome_target_regions(event_info_dict, ref_genome_fasta, patch_db_fast
         event_acc = event["entry"]
 
         chrA = event["chrA"]
-        coordA = int(float(event["coordA"]))
+        coordA = float(event["coordA"])
         orientA = event["orientA"]
         coordA = coordA - 1 if orientA == "+" else coordA + 1
 
         chrB = event["chrB"]
-        coordB = int(float(event["coordB"]))
+        coordB = float(event["coordB"])
         orientB = event["orientB"]
         coordB = coordB + 1 if orientB == "+" else coordB - 1
 

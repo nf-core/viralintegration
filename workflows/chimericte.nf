@@ -48,8 +48,8 @@ include { REMOVE_DUPLICATES } from '../modules/local/remove_duplicates'
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { HOST_TE        } from '../subworkflows/local/host_te'
-include { PLUS_TE        } from '../subworkflows/local/plus_te'
+include { QUALITY_TRIM        } from '../subworkflows/local/quality_trim'
+include { ALIGN_PLUS        } from '../subworkflows/local/align_plus'
 include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
 include { VALIDATE } from '../subworkflows/local/validate'
 
@@ -99,15 +99,13 @@ workflow CHIMERICTE {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
-    // SUBWORKFLOW: Align input reads against host genome.
+    // SUBWORKFLOW: Quality/adapter trim input reads
     //
 
-    HOST_TE (
-        INPUT_CHECK.out.reads,
-        params.fasta,
-        params.gtf
+    QUALITY_TRIM (
+        INPUT_CHECK.out.reads
     )
-    ch_versions = ch_versions.mix(HOST_TE.out.versions)
+    ch_versions = ch_versions.mix(QUALITY_TRIM.out.versions)
 
     CAT_FASTA (
         params.fasta,
@@ -119,23 +117,22 @@ workflow CHIMERICTE {
     // SUBWORKFLOW: Align filtered reads against combined host and te reference.
     //
 
-    PLUS_TE (
-        HOST_TE.out.polya_trimmed,
+    ALIGN_PLUS (
+        QUALITY_TRIM.out.polya_trimmed,
         CAT_FASTA.out.plus_fasta,
         params.gtf,
     )
-    ch_versions = ch_versions.mix(PLUS_TE.out.versions)
+    ch_versions = ch_versions.mix(ALIGN_PLUS.out.versions)
 
     //
     // SUBWORKFLOW: Map potential transposable elements and create virus infection evidence viewer.
-    // All input files will have concatenated results from HOST and PLUS for TE workflow
 
     INSERTION_SITES (
-        PLUS_TE.out.bam_bai_junction,
+        ALIGN_PLUS.out.bam_bai_junction,
         params.fasta,
         params.te_fasta,
-        PLUS_TE.out.bam,
-        PLUS_TE.out.bai,
+        ALIGN_PLUS.out.bam,
+        ALIGN_PLUS.out.bai,
         ch_igvjs_VIF
     )
     ch_versions = ch_versions.mix(INSERTION_SITES.out.versions)
@@ -147,7 +144,7 @@ workflow CHIMERICTE {
     VALIDATE (
         INPUT_CHECK.out.reads, // TODO think about the logic
         INSERTION_SITES.out.fasta_extract,
-        PLUS_TE.out.index
+        ALIGN_PLUS.out.index
     )
     ch_versions = ch_versions.mix(VALIDATE.out.versions)
 
@@ -208,9 +205,9 @@ workflow CHIMERICTE {
         .mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
         .mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         .mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-        // .mix(HOST_TE.out.log_final.collect{it[1]}.ifEmpty([]))
+        // .mix(QUALITY_TRIM.out.log_final.collect{it[1]}.ifEmpty([]))
         //.mix(TRIMMOMATIC.out.mqc_log.collect{it[1]}.ifEmpty([]))
-        .mix(PLUS_TE.out.log_final.collect{it[1]}.ifEmpty([]))
+        .mix(ALIGN_PLUS.out.log_final.collect{it[1]}.ifEmpty([]))
         .mix(VALIDATE.out.log_final.collect{it[1]}.ifEmpty([]))
 
 

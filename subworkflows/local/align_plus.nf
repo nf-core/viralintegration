@@ -7,7 +7,7 @@ include { STAR_GENOMEGENERATE } from '../../modules/nf-core/star/genomegenerate/
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main.nf'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main.nf'
 
-workflow PLUS_TE {
+workflow ALIGN_PLUS {
     take:
     reads // channel: [ val(meta), [ reads ] ]
     fasta // file: /path/to/fasta/

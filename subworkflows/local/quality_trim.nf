@@ -5,7 +5,7 @@
 include { TRIMMOMATIC } from "../../modules/nf-core/trimmomatic/main.nf"
 include { POLYA_STRIPPER } from '../../modules/local/polyA_stripper.nf'
 
-workflow HOST_TE {
+workflow QUALITY_TRIM {
     take:
     reads // channel: [ val(meta), [ reads ] ]
 

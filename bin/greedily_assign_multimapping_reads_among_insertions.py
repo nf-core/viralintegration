@@ -74,7 +74,7 @@ def main():
     rows_grouped_by_virus_brkpt = defaultdict(list)
     for row in tab_reader:
         if not (
-            (re.match("chr[\dMXY]+$", row["chrA"]) is not None) | (re.match("chr[\dMXY]+$", row["chrB"]) is not None)
+            (re.match("chr[\dMXY]+$", row["chrA"]) is not None) ^ (re.match("chr[\dMXY]+$", row["chrB"]) is not None)
         ):
             # only considering the main chromosomes
             continue

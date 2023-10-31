@@ -136,21 +136,21 @@ def main():
 
             prev_read_name = read_name
 
-        # chr_donorA_is_virus = row["chr_donorA"] in viral_db_entries
-        # chr_donorB_is_virus = row["chr_acceptorB"] in viral_db_entries
+        chr_donorA_is_virus = row["chr_donorA"] in viral_db_entries
+        chr_donorB_is_virus = row["chr_acceptorB"] in viral_db_entries
 
-        # if (chr_donorA_is_virus ^ chr_donorB_is_virus) and "chrM" not in (row["chr_donorA"], row["chr_acceptorB"]):
-        reads_collected.append(row)
+        if (chr_donorA_is_virus ^ chr_donorB_is_virus) and "chrM" not in (row["chr_donorA"], row["chr_acceptorB"]):
+            reads_collected.append(row)
 
-        # else:
+        else:
             # ignore those that show up as human/human or virus/virus chimeric reads - not to be trusted as human/virus evidence
-            # prev_nonrelevant_chim = True
+            prev_nonrelevant_chim = True
 
     # get last one
-    # if not prev_nonrelevant_chim:
-    count_virus_chims += 1
-    for read in reads_collected:
-        writer.writerow(read)
+    if not prev_nonrelevant_chim:
+        count_virus_chims += 1
+        for read in reads_collected:
+            writer.writerow(read)
 
     logger.info(f"Extracted {count_virus_chims} human/virus chimeric reads")
 

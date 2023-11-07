@@ -1,0 +1,47 @@
+nextflow_process {
+
+    name "Test Process INSERTION_SITE_CANDIDATES"
+    script "modules/local/insertion_site_candidates.nf"
+    process "INSERTION_SITE_CANDIDATES"
+
+    // files in tuples
+    // 1. bam: from align_plus: samtools sort out bam:
+    // 2. bai: from align_plus: samtools index out bai:
+    // 3. junction: from align_plus: star align plus out junction:
+
+    test("Should run without failures") {
+
+        when {
+            process {
+                """
+                // Tuple, don't include {meta}
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                        file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/task.ext.prefix.bam',checkIfExists: true),
+                        file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/task.ext.prefix.bam.bai',checkIfExists: true),
+                        file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/testDm_T1.plus.Chimeric.out.junction',checkIfExists: true)
+                    ]
+                // Individual inputs
+                input[1] = file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/Dmelanogaster_data/chr2L_Dmelanogaster.fa', checkIfExists: true)
+                input[2] = file("https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/Dmelanogaster_data/transposons_Dmelanogaster.fa", checkIfExists: true)
+                """
+            }
+        }
+
+        // chimericte
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/task.ext.prefix.bam',checkIfExists: true),
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/task.ext.prefix.bam.bai',checkIfExists: true),
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/chimericte/testDm_T1.plus.Chimeric.out.junction',checkIfExists: true)
+
+        // viralintegration
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/viralintegration/test_T1.bam',checkIfExists: true),
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/viralintegration/test_T1.bam.bai',checkIfExists: true),
+        //file('https://raw.githubusercontent.com/SnehaGummadi/viralintegration/master/nf_test_files/viralintegration/test_T1.plus.Chimeric.out.junction',checkIfExists: true)
+
+
+        then {
+            assert process.success
+        }
+
+    }
+}

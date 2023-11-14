@@ -38,7 +38,6 @@ include { CAT_FASTA } from '../modules/local/cat_fasta'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { HOST        } from '../subworkflows/local/host'
 include { PLUS        } from '../subworkflows/local/plus'
 include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
@@ -107,7 +106,7 @@ workflow VIRALINTEGRATION {
     //
 
     HOST (
-        INPUT_CHECK.out.reads,
+        ch_fastq,
         params.fasta,
         params.gtf
     )

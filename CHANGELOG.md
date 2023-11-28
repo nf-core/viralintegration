@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Added`
 
 - Pipeline summary to README
+- Update to nf-core/tools v2.9
 
 ## v0.1.0 - [2023-03-29]
 

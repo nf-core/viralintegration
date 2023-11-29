@@ -42,7 +42,6 @@ include { HOST        } from '../subworkflows/local/host'
 include { PLUS        } from '../subworkflows/local/plus'
 include { INSERTION_SITES } from '../subworkflows/local/insertion_sites'
 include { VALIDATE } from '../subworkflows/local/validate'
-include { CHIMERIC_READS } from '../subworkflows/local/chimeric_reads'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +113,6 @@ workflow VIRALINTEGRATION {
 
     //
     // MODULE: CAT viral and host reference fastas.
-    //
 
     CAT_FASTA (
         params.fasta,

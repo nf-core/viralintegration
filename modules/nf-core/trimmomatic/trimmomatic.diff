@@ -1,21 +1,81 @@
 Changes in module 'nf-core/trimmomatic'
+--- modules/nf-core/trimmomatic/meta.yml
++++ modules/nf-core/trimmomatic/meta.yml
+@@ -4,13 +4,16 @@
+   - trimming
+   - adapter trimming
+   - quality trimming
++
+ tools:
+   - "trimmomatic":
+       description: "A flexible read trimming tool for Illumina NGS data"
+       homepage: "http://www.usadellab.org/cms/?page=trimmomatic"
+       documentation: "https://github.com/usadellab/Trimmomatic"
++      tool_dev_url: "None"
+       doi: "10.1093/bioinformatics/btu170"
+       licence: "['GPL v3']"
++
+ input:
+   - meta:
+       type: map
+@@ -22,6 +25,7 @@
+       description: |
+         Input FastQ files of size 1 or 2 for single-end and paired-end data, respectively.
+       pattern: "*.fastq.gz"
++
+ output:
+   - meta:
+       type: map
+@@ -40,15 +44,10 @@
+       type: file
+       description: trimmomatic log file
+       pattern: "*.log"
+-  - summary:
+-      type: file
+-      description: trimmomatic summary file of surviving and dropped reads
+-      pattern: "*.summary"
+   - versions:
+       type: file
+       description: File containing software versions
+       pattern: "versions.yml"
++
+ authors:
+   - "@alyssa-ab"
+-maintainers:
+-  - "@alyssa-ab"
+
 --- modules/nf-core/trimmomatic/main.nf
 +++ modules/nf-core/trimmomatic/main.nf
-@@ -13,7 +13,8 @@
+@@ -2,10 +2,10 @@
+     tag "$meta.id"
+     label 'process_medium'
+ 
+-    conda "${moduleDir}/environment.yml"
++    conda "bioconda::trimmomatic=0.39"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+         'https://depot.galaxyproject.org/singularity/trimmomatic:0.39--hdfd78af_2':
+-        'biocontainers/trimmomatic:0.39--hdfd78af_2' }"
++        'quay.io/biocontainers/trimmomatic:0.39--hdfd78af_2' }"
+ 
+     input:
+     tuple val(meta), path(reads)
+@@ -13,8 +13,8 @@
      output:
      tuple val(meta), path("*.paired.trim*.fastq.gz")   , emit: trimmed_reads
      tuple val(meta), path("*.unpaired.trim_*.fastq.gz"), optional:true, emit: unpaired_reads
 -    tuple val(meta), path("*.log")                     , emit: log
+-    tuple val(meta), path("*.summary")                 , emit: summary
 +    tuple val(meta), path("*.trimmomatic.log")         , emit: trimlog
 +    tuple val(meta), path("*.trim_out.log")            , emit: mqc_log
      path "versions.yml"                                , emit: versions
  
      when:
-@@ -32,11 +33,12 @@
+@@ -33,12 +33,12 @@
      trimmomatic \\
          $trimmed \\
          -threads $task.cpus \\
 -        -trimlog ${prefix}.log \\
+-        -summary ${prefix}.summary \\
 +        -trimlog ${prefix}.trimmomatic.log \\
          $reads \\
          $output \\

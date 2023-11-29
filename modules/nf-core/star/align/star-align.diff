@@ -1,31 +1,134 @@
 Changes in module 'nf-core/star/align'
+--- modules/nf-core/star/align/meta.yml
++++ modules/nf-core/star/align/meta.yml
+@@ -25,33 +25,10 @@
+       description: |
+         List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+         respectively.
+-  - meta2:
+-      type: map
+-      description: |
+-        Groovy Map containing reference information
+-        e.g. [ id:'test' ]
+   - index:
+       type: directory
+       description: STAR genome index
+       pattern: "star"
+-  - meta3:
+-      type: map
+-      description: |
+-        Groovy Map containing reference information
+-        e.g. [ id:'test' ]
+-  - gtf:
+-      type: file
+-      description: Annotation GTF file
+-      pattern: "*.{gtf}"
+-  - star_ignore_sjdbgtf:
+-      type: boolean
+-      description: Ignore annotation GTF file
+-  - seq_platform:
+-      type: string
+-      description: Sequencing platform
+-  - seq_center:
+-      type: string
+-      description: Sequencing center
+ output:
+   - bam:
+       type: file
+@@ -97,19 +74,8 @@
+       type: file
+       description: STAR chimeric junction output file (optional)
+       pattern: "*.out.junction"
+-  - wig:
+-      type: file
+-      description: STAR output wiggle format file(s) (optional)
+-      pattern: "*.wig"
+-  - bedgraph:
+-      type: file
+-      description: STAR output bedGraph format file(s) (optional)
+-      pattern: "*.bg"
++
+ authors:
+   - "@kevinmenden"
+   - "@drpatelh"
+   - "@praveenraj2018"
+-maintainers:
+-  - "@kevinmenden"
+-  - "@drpatelh"
+-  - "@praveenraj2018"
+
 --- modules/nf-core/star/align/main.nf
 +++ modules/nf-core/star/align/main.nf
-@@ -2,15 +2,16 @@
+@@ -2,37 +2,34 @@
      tag "$meta.id"
      label 'process_high'
  
--    conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
+-    conda "${moduleDir}/environment.yml"
 +    // Note: 2.7X indices incompatible with AWS iGenomes.
 +    conda "bioconda::star=2.7.9a"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
--        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' :
--        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' }"
+-        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:019f262d90511939dce2dca4b7c868fc108f73db-0' :
+-        'biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:019f262d90511939dce2dca4b7c868fc108f73db-0' }"
 +        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' :
 +        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' }"
  
      input:
-     tuple val(meta), path(reads)
--    path index
--    path gtf
+-    tuple val(meta), path(reads, stageAs: "input*/*")
+-    tuple val(meta2), path(index)
+-    tuple val(meta3), path(gtf)
++    tuple val(meta), path(reads)
 +    path  index
 +    path  gtf
      val star_ignore_sjdbgtf
      val seq_platform
      val seq_center
-@@ -51,9 +52,7 @@
+ 
+     output:
++    tuple val(meta), path('*d.out.bam')       , emit: bam
+     tuple val(meta), path('*Log.final.out')   , emit: log_final
+     tuple val(meta), path('*Log.out')         , emit: log_out
+     tuple val(meta), path('*Log.progress.out'), emit: log_progress
+     path  "versions.yml"                      , emit: versions
+ 
+-    tuple val(meta), path('*d.out.bam')              , optional:true, emit: bam
+     tuple val(meta), path('*sortedByCoord.out.bam')  , optional:true, emit: bam_sorted
+     tuple val(meta), path('*toTranscriptome.out.bam'), optional:true, emit: bam_transcript
+     tuple val(meta), path('*Aligned.unsort.out.bam') , optional:true, emit: bam_unsorted
+     tuple val(meta), path('*fastq.gz')               , optional:true, emit: fastq
+     tuple val(meta), path('*.tab')                   , optional:true, emit: tab
+-    tuple val(meta), path('*.SJ.out.tab')            , optional:true, emit: spl_junc_tab
+-    tuple val(meta), path('*.ReadsPerGene.out.tab')  , optional:true, emit: read_per_gene_tab
+     tuple val(meta), path('*.out.junction')          , optional:true, emit: junction
+     tuple val(meta), path('*.out.sam')               , optional:true, emit: sam
+-    tuple val(meta), path('*.wig')                   , optional:true, emit: wig
+-    tuple val(meta), path('*.bg')                    , optional:true, emit: bedgraph
+ 
+     when:
+     task.ext.when == null || task.ext.when
+@@ -40,27 +37,22 @@
+     script:
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+-    def reads1 = [], reads2 = []
+-    meta.single_end ? [reads].flatten().each{reads1 << it} : reads.eachWithIndex{ v, ix -> ( ix & 1 ? reads2 : reads1) << v }
+     def ignore_gtf      = star_ignore_sjdbgtf ? '' : "--sjdbGTFfile $gtf"
+     def seq_platform    = seq_platform ? "'PL:$seq_platform'" : ""
+-    def seq_center      = seq_center ? "'CN:$seq_center'" : ""
+-    def attrRG          = args.contains("--outSAMattrRGline") ? "" : "--outSAMattrRGline 'ID:$prefix' $seq_center 'SM:$prefix' $seq_platform"
++    def seq_center      = seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$seq_center' 'SM:$prefix' $seq_platform " : "--outSAMattrRGline ID:$prefix 'SM:$prefix' $seq_platform "
+     def out_sam_type    = (args.contains('--outSAMtype')) ? '' : '--outSAMtype BAM Unsorted'
+     def mv_unsorted_bam = (args.contains('--outSAMtype BAM Unsorted SortedByCoordinate')) ? "mv ${prefix}.Aligned.out.bam ${prefix}.Aligned.unsort.out.bam" : ''
+     """
+     STAR \\
+         --genomeDir $index \\
+-        --readFilesIn ${reads1.join(",")} ${reads2.join(",")} \\
++        --readFilesIn $reads  \\
+         --runThreadN $task.cpus \\
+         --outFileNamePrefix $prefix. \\
+         $out_sam_type \\
          $ignore_gtf \\
-         $seq_center \\
+-        $attrRG \\
++        $seq_center \\
          $args
 -
      $mv_unsorted_bam
@@ -33,7 +136,7 @@ Changes in module 'nf-core/star/align'
      if [ -f ${prefix}.Unmapped.out.mate1 ]; then
          mv ${prefix}.Unmapped.out.mate1 ${prefix}.unmapped_1.fastq
          gzip ${prefix}.unmapped_1.fastq
-@@ -62,36 +61,9 @@
+@@ -69,41 +61,9 @@
          mv ${prefix}.Unmapped.out.mate2 ${prefix}.unmapped_2.fastq
          gzip ${prefix}.unmapped_2.fastq
      fi
@@ -56,11 +159,16 @@ Changes in module 'nf-core/star/align'
 -    touch ${prefix}.sortedByCoord.out.bam
 -    touch ${prefix}.toTranscriptome.out.bam
 -    touch ${prefix}.Aligned.unsort.out.bam
+-    touch ${prefix}.Aligned.sortedByCoord.out.bam
 -    touch ${prefix}.unmapped_1.fastq.gz
 -    touch ${prefix}.unmapped_2.fastq.gz
 -    touch ${prefix}.tab
+-    touch ${prefix}.SJ.out.tab
+-    touch ${prefix}.ReadsPerGene.out.tab
 -    touch ${prefix}.Chimeric.out.junction
 -    touch ${prefix}.out.sam
+-    touch ${prefix}.Signal.UniqueMultiple.str1.out.wig
+-    touch ${prefix}.Signal.UniqueMultiple.str1.out.bg
 -
 -    cat <<-END_VERSIONS > versions.yml
 -    "${task.process}":

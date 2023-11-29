@@ -18,36 +18,33 @@ This pipeline is a re-implementation of [CTAT-VirusIntegrationFinder v1.5.0](htt
 
 ### `Pipeline Summary`
 
-1. Input Check
-   - Input path to sample FASTAs in samplesheet.csv
-   - Check that sample meets requirements (samplesheet_check)
-2. Read QC (FastQC)
-3. Align reads to human genome
+1. Read QC (FastQC)
+2. Align reads to human genome
    - Generate index and perform alignment (STAR)
-4. Quality trimming for unaligned reads
+3. Quality trimming for unaligned reads
    - Quality and adaptor trimming (Trimmomatic)
    - Remove polyAs from reads (PolyAStripper)
-5. Identify chimeric reads
+4. Identify chimeric reads
    - Combine human and virus FASTAs (cat_fasta)
    - Generate index and perform alignment to combined human + viral reference (STAR)
    - Sort and index alignments (SAMtools)
    - Determine potential insertion site candidates and optimize file (insertion_site_candidates, abridged_TSV)
-6. Virus Report outputs:
+5. Virus Report outputs:
    - Viral read counts in a tsv table and png plot
    - Preliminary genome wide abundance plot
    - Bam and bai for reads detected in potential viral insertion site
    - Web based interactive genome viewer for virus infection evidence (VirusDetect.igvjs.html)
-7. Verify chimeric reads
+6. Verify chimeric reads
    - Create chimeric FASTA and GTF extracts (extract_chimeric_genomic_targets)
    - Generate index and perform alignment to verify chimeric reads (STAR)
    - Sort and index validated alignments (SAMtools)
    - Remove duplicate alignments (remove_duplicates)
    - Generate evidence counts for chimeric reads (chimeric_contig_evidence_analyzer)
-8. Summary Report outputs:
+7. Summary Report outputs:
    - Refined genome wide abundance plog png
    - Insertion site candidates in tab-delimited format with gene annotations (vif.refined.wRefGeneAnnots.tsv)
    - Web based interactive genome viewer for virus insertion sites (vif.html)
-9. Present quality checking and visualization for raw reads, adaptor trimming, and STAR alignments (MultiQC)
+8. Present quality checking and visualization for raw reads, adaptor trimming, and STAR alignments (MultiQC)
 
 ### `Added`
 

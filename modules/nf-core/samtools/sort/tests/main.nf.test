@@ -1,7 +1,7 @@
 nextflow_process {
 
     name "Test Process SAMTOOLS_SORT"
-    script "../main.nf"
+    script "modules/nf-core/samtools/sort/main.nf"
     process "SAMTOOLS_SORT"
     tag "modules"
     tag "modules_nfcore"

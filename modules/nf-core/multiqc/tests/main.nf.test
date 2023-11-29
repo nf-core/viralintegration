@@ -1,7 +1,7 @@
 nextflow_process {
 
     name "Test Process MULTIQC"
-    script "../main.nf"
+    script "modules/nf-core/multiqc/main.nf"
     process "MULTIQC"
     tag "modules"
     tag "modules_nfcore"

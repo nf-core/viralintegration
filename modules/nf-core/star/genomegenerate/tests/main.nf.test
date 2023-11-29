@@ -1,7 +1,7 @@
 nextflow_process {
 
     name "Test Process STAR_GENOMEGENERATE"
-    script "../main.nf"
+    script "modules/nf-core/star/genomegenerate/main.nf"
     process "STAR_GENOMEGENERATE"
     tag "modules"
     tag "modules_nfcore"

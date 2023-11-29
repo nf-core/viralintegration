@@ -1,7 +1,7 @@
 nextflow_process {
 
     name "Test Process STAR_ALIGN"
-    script "../main.nf"
+    script "modules/nf-core/star/align/main.nf"
     process "STAR_ALIGN"
     tag "modules"
     tag "modules_nfcore"

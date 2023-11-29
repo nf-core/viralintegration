@@ -1,26 +1,72 @@
 Changes in module 'nf-core/star/genomegenerate'
+--- modules/nf-core/star/genomegenerate/meta.yml
++++ modules/nf-core/star/genomegenerate/meta.yml
+@@ -15,28 +15,14 @@
+       doi: 10.1093/bioinformatics/bts635
+       licence: ["MIT"]
+ input:
+-  - meta:
+-      type: map
+-      description: |
+-        Groovy Map containing sample information
+-        e.g. [ id:'test', single_end:false ]
+   - fasta:
+       type: file
+       description: Fasta file of the reference genome
+-  - meta2:
+-      type: map
+-      description: |
+-        Groovy Map containing reference information
+-        e.g. [ id:'test' ]
+   - gtf:
+       type: file
+       description: GTF file of the reference genome
++
+ output:
+-  - meta:
+-      type: map
+-      description: |
+-        Groovy Map containing sample information
+-        e.g. [ id:'test', single_end:false ]
+   - index:
+       type: directory
+       description: Folder containing the star index files
+@@ -45,9 +31,7 @@
+       type: file
+       description: File containing software versions
+       pattern: "versions.yml"
++
+ authors:
+   - "@kevinmenden"
+   - "@drpatelh"
+-maintainers:
+-  - "@kevinmenden"
+-  - "@drpatelh"
+
 --- modules/nf-core/star/genomegenerate/main.nf
 +++ modules/nf-core/star/genomegenerate/main.nf
 @@ -2,18 +2,19 @@
      tag "$fasta"
      label 'process_high'
  
--    conda "bioconda::star=2.7.10a bioconda::samtools=1.16.1 conda-forge::gawk=5.1.0"
+-    conda "${moduleDir}/environment.yml"
 +    // Note: 2.7X indices incompatible with AWS iGenomes.
 +    conda "bioconda::star=2.7.9a bioconda::samtools=1.15.1 conda-forge::gawk=5.1.0"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
--        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' :
--        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0' }"
+-        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:019f262d90511939dce2dca4b7c868fc108f73db-0' :
+-        'biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:019f262d90511939dce2dca4b7c868fc108f73db-0' }"
 +        'https://depot.galaxyproject.org/singularity/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' :
 +        'quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1c4c32d87798d425c970ececfbadd155e7560277-0' }"
  
      input:
-     path fasta
-     path gtf
+-    tuple val(meta), path(fasta)
+-    tuple val(meta2), path(gtf)
++    path fasta
++    path gtf
  
      output:
--    path "star"        , emit: index
--    path "versions.yml", emit: versions
+-    tuple val(meta), path("star")  , emit: index
+-    path "versions.yml"            , emit: versions
 +    path "star"         , emit: index
 +    path "versions.yml" , emit: versions
  

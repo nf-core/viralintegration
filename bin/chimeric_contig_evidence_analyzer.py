@@ -97,7 +97,7 @@ def main():
         removed_tsv = open(removed_output_tsv, "wt")
 
     #####################
-    # nalyze_bam_n_gtf
+    # analyze_bam_n_gtf
     #####################
     contig_readnames_want_set = analyze_bam_n_gtf(
         bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min_seq_entropy, min_per_id, removed_tsv
@@ -206,7 +206,7 @@ def analyze_bam_n_gtf(bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min
 
         # check if read name was already added
         #############################################################################
-        # Is it possoble that a read name apears twice here?
+        # Is it possible that a read name appears twice here?
         #############################################################################
         # If so, and passes clipping filter, update the
         if read_name in read_to_contig_and_type[contig] and read_to_contig_and_type[contig][read_name] == "split":
@@ -249,7 +249,7 @@ def analyze_bam_n_gtf(bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min
                 read_to_contig_and_type[contig][read_name] = "split"
 
         else:
-            # Doesnt span the breakpoint
+            # Doesn't span the breakpoint
             if DEBUG:
                 removed_tsv.write(
                     "\t".join(
@@ -271,7 +271,7 @@ def analyze_bam_n_gtf(bam_file, gtf_file, ofh_tsv, min_anchor, max_end_clip, min
         excessively_softclipped_reads = contig_readnames_to_excessive_soft_clip[contig]
 
         for readname in contig_readnames_to_anchor_lengths[contig]:
-            # Check if filterd due to soft/hard clipping
+            # Check if filtered due to soft/hard clipping
             if readname in excessively_softclipped_reads:
                 continue
 
@@ -357,7 +357,7 @@ def excessive_clipping(aligned_read, max_end_clip):
     #    | H |  BAM_CHARD_CLIP | 5 |
     #
     # tupple = (code, number_bases)
-    # If soft or hard clipped, check how mnay, see if greater than the maximum amount of read end clipping allowed
+    # If soft or hard clipped, check how many, see if greater than the maximum amount of read end clipping allowed
     if cigartuples[0][0] in (4, 5) and cigartuples[0][1] > max_end_clip:
         return True
     # Check for a second tuple

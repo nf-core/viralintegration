@@ -96,7 +96,7 @@ For more details about the output files and reports, please refer to the
 
 ## Credits
 
-nf-core/viralintegration was originally written by Alyssa Briggs ([@alyssa-ab](https://github.com/alyssa-ab)) and Edmund Miller ([@Emiller88](https://github.com/emiller88)) from [The Functional Genomics Laboratory](https://taehoonkim.org/) at [The Univeristy of Texas at Dallas](https://www.utdallas.edu/).
+nf-core/viralintegration was originally written by Alyssa Briggs ([@alyssa-ab](https://github.com/alyssa-ab)) and Edmund Miller ([@edmundmiller](https://github.com/edmundmiller)) from [The Functional Genomics Laboratory](https://taehoonkim.org/) at [The Univeristy of Texas at Dallas](https://www.utdallas.edu/).
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 

@@ -61,7 +61,7 @@ By default, the pipeline uses the [CTAT-VIF human virus database](https://github
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/viralintegration --input ./samplesheet.csv --outdir ./results --genome GRCh37 -profile docker
+nextflow run nf-core/viralintegration --input ./samplesheet.csv --outdir ./results --genome GRCh38 -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -92,7 +92,8 @@ with `params.yaml` containing:
 ```yaml
 input: './samplesheet.csv'
 outdir: './results/'
-genome: 'GRCh37'
+genome: 'GRCh38'
+input: 'data'
 <...>
 ```
 

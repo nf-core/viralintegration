@@ -20,7 +20,6 @@ nextflow.enable.dsl = 2
 include { VIRALINTEGRATION  } from './workflows/viralintegration'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_viralintegration_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_viralintegration_pipeline'
-
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_viralintegration_pipeline'
 
 /*
@@ -33,6 +32,7 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_vira
 //   This is an example of how to use getGenomeAttribute() to fetch parameters
 //   from igenomes.config using `--genome`
 params.fasta = getGenomeAttribute('fasta')
+params.gtf = getGenomeAttribute('gtf')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

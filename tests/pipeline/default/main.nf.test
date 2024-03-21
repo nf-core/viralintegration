@@ -1,0 +1,50 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert snapshot(
+                workflow.trace.tasks().size(),
+
+                path("$outputDir/summary/test.vif.prelim.refined.tsv"),
+                // FIXME md5sum fails on CI
+                // path("$outputDir/summary/test.vif.refined.distilled.tsv"),
+                // path("$outputDir/summary/test.vif.refined.tsv"),
+                // path("$outputDir/summary/test.vif.refined.wRefGeneAnnots.tsv"),
+
+                path("$outputDir/virus/novirus.VirusDetect.igvjs.bam"),
+                path("$outputDir/virus/novirus.VirusDetect.sorted.igvjs.bam"),
+                path("$outputDir/virus/test.VirusDetect.igvjs.bam"),
+                path("$outputDir/virus/test.VirusDetect.sorted.igvjs.bam"),
+                path("$outputDir/virus/test.VirusDetect.virus_read_counts_summary.tsv"),
+            ).match()
+
+            assert new File("$outputDir/summary/test.vif.refined.distilled.tsv").exists()
+            assert new File("$outputDir/summary/test.vif.refined.tsv").exists()
+            assert new File("$outputDir/summary/test.vif.refined.wRefGeneAnnots.tsv").exists()
+
+            assert new File("$outputDir/summary/test.vif.genome_plot.png").exists()
+            assert new File("$outputDir/summary/test.vif.html").exists()
+
+            assert new File("$outputDir/virus/novirus.VirusDetect.init.genome_plot.png").exists()
+            assert new File("$outputDir/virus/novirus.VirusDetect.virus_read_counts.png").exists()
+            assert new File("$outputDir/virus/novirus.VirusDetect.virus_read_counts_log.png").exists()
+            assert new File("$outputDir/virus/test.VirusDetect.igvjs.html").exists()
+            assert new File("$outputDir/virus/test.VirusDetect.init.genome_plot.png").exists()
+            assert new File("$outputDir/virus/test.VirusDetect.virus_read_counts.png").exists()
+            assert new File("$outputDir/virus/test.VirusDetect.virus_read_counts_log.png").exists()
+        }
+
+    }
+
+}

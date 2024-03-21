@@ -1,0 +1,14 @@
+{
+    "Should run without failures": {
+        "content": [
+            33,
+            "test.vif.prelim.refined.tsv:md5,17b26b7a86d61206154ca3e2df02fc48",
+            "novirus.VirusDetect.igvjs.bam:md5,1ace945eb2ce9ec48b3de1988cf26ba4",
+            "novirus.VirusDetect.sorted.igvjs.bam:md5,ac314f2d8b013e136c829e166806a182",
+            "test.VirusDetect.igvjs.bam:md5,8462d7f485afea5cd33eff2bb1611cd2",
+            "test.VirusDetect.sorted.igvjs.bam:md5,56f176c542e02f88779737105a864150",
+            "test.VirusDetect.virus_read_counts_summary.tsv:md5,c051eb1a25e4741c43274589f75b80b6"
+        ],
+        "timestamp": "2023-11-28T20:39:55+0000"
+    }
+}

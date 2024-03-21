@@ -19,28 +19,50 @@
 
 ## Introduction
 
-**nf-core/viralintegration** is a bioinformatics pipeline that ...
+**nf-core/viralintegration** is a bioinformatics best-practice analysis pipeline for the identification of viral integration events in genomes using a chimeric read approach. It was initially based on the [CTAT-VirusIntegrationFinder](https://github.com/broadinstitute/CTAT-VirusIntegrationFinder).
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
+The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
+
+On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources.The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/viralintegration/results).
+
+## Pipeline summary
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+2. Align reads to human genome
+   - Generate index and perform alignment (STAR)
+3. Quality trimming for unaligned reads
+   - Quality and adaptor trimming (Trimmomatic)
+   - Remove polyAs from reads (PolyAStripper)
+4. Identify chimeric reads
+   - Combine human and virus FASTAs (cat_fasta)
+   - Generate index and perform alignment to combined human + viral reference (STAR)
+   - Sort and index alignments (SAMtools)
+   - Determine potential insertion site candidates and optimize file (insertion_site_candidates, abridged_TSV)
+5. Virus Report outputs:
+   - Viral read counts in a tsv table and png plot
+   - Preliminary genome wide abundance plot
+   - Bam and bai for reads detected in potential viral insertion site
+   - Web based interactive genome viewer for virus infection evidence (VirusDetect.igvjs.html)
+6. Verify chimeric reads
+   - Create chimeric FASTA and GTF extracts (extract_chimeric_genomic_targets)
+   - Generate index and perform alignment to verify chimeric reads (STAR)
+   - Sort and index validated alignments (SAMtools)
+   - Remove duplicate alignments (remove_duplicates)
+   - Generate evidence counts for chimeric reads (chimeric_contig_evidence_analyzer)
+7. Summary Report outputs:
+   - Refined genome wide abundance plog png
+   - Insertion site candidates in tab-delimited format with gene annotations (vif.refined.wRefGeneAnnots.tsv)
+   - Web based interactive genome viewer for virus insertion sites (vif.html)
+8. Present quality checking and visualization for raw reads, adaptor trimming, and STAR alignments ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
-> [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
-
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
+> **Note**
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
+> to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
+> with `-profile test` before running the workflow on actual data.
 
 First, prepare a samplesheet with your input data that looks as follows:
 
@@ -53,11 +75,7 @@ CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
 
--->
-
 Now, you can run the pipeline using:
-
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
 ```bash
 nextflow run nf-core/viralintegration \
@@ -72,6 +90,10 @@ nextflow run nf-core/viralintegration \
 
 For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/viralintegration/usage) and the [parameter documentation](https://nf-co.re/viralintegration/parameters).
 
+```bash
+nextflow run nf-core/viralintegration --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+```
+
 ## Pipeline output
 
 To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/viralintegration/results) tab on the nf-core website pipeline page.
@@ -80,11 +102,12 @@ For more details about the output files and reports, please refer to the
 
 ## Credits
 
-nf-core/viralintegration was originally written by Alyssa Briggs, Edmund Miller.
+nf-core/viralintegration was originally written by Alyssa Briggs ([@alyssa-ab](https://github.com/alyssa-ab)) and Edmund Miller ([@edmundmiller](https://github.com/edmundmiller)) from [The Functional Genomics Laboratory](https://taehoonkim.org/) at [The Univeristy of Texas at Dallas](https://www.utdallas.edu/).
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+- [Tae Hoon Kim](https://github.com/taehoonkim-phd)
+- [Robert Allaway](https://github.com/allaway)
 
 ## Contributions and Support
 
@@ -94,10 +117,7 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 ## Citations
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use nf-core/viralintegration for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+If you use nf-core/viralintegration for your analysis, please cite it using the following doi: [10.5281/zenodo.7783480](https://doi.org/10.5281/zenodo.7783480)
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 

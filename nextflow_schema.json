@@ -28,7 +28,7 @@
                     "format": "file-path",
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.fasta",
+                    "default": "https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/VIRUS_INSERTION_FINDING_LIB_SUPPLEMENT/virus_db.nr.fasta",
                     "description": "Path to fasta file with viral genomes",
                     "fa_icon": "fas fa-viruses"
                 },
@@ -107,7 +107,7 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
+                    "default": "s3://ngi-igenomes/igenomes/",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
                 },
